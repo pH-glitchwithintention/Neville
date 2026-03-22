@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>You Are Already It</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --gold:#e8c97e; --deep:#0d0d1a; --mid:#1a1a2e; --surface:#16213e;
+    --text:#f0ead8; --muted:#8a8faa; --accent:#c97eb5; --green:#7ed4a8; --red:#e87e7e; --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;background:var(--deep);color:var(--text);min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:
+      radial-gradient(1px 1px at 20% 30%,rgba(232,201,126,.4) 0%,transparent 100%),
+      radial-gradient(1px 1px at 80% 10%,rgba(201,126,181,.3) 0%,transparent 100%),
+      radial-gradient(1px 1px at 50% 60%,rgba(255,255,255,.2) 0%,transparent 100%),
+      radial-gradient(1px 1px at 10% 80%,rgba(126,212,168,.3) 0%,transparent 100%),
+      radial-gradient(1.5px 1.5px at 70% 70%,rgba(232,201,126,.3) 0%,transparent 100%),
+      radial-gradient(1px 1px at 35% 15%,rgba(255,255,255,.25) 0%,transparent 100%),
+      radial-gradient(1.5px 1.5px at 45% 85%,rgba(126,212,168,.25) 0%,transparent 100%);}
+  #app{position:relative;z-index:1;max-width:600px;margin:0 auto;padding:20px 16px 90px;}
+  .screen{display:none;animation:fadeIn .4s ease;}.screen.active{display:block;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+  /* NAV */
+  .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(13,13,26,.97);backdrop-filter:blur(12px);border-top:1px solid rgba(232,201,126,.12);display:flex;justify-content:space-around;align-items:center;padding:10px 0 max(10px,env(safe-area-inset-bottom));}
+  .nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;color:var(--muted);font-size:10px;font-family:'DM Sans',sans-serif;transition:color .2s;padding:4px 8px;position:relative;}
+  .nav-btn.active{color:var(--gold);}
+  .nav-btn svg{width:20px;height:20px;}
+  .nav-dot{position:absolute;top:0;right:4px;width:7px;height:7px;border-radius:50%;background:var(--accent);display:none;}
+  .nav-dot.show{display:block;}
+
+  /* CARDS */
+  .card{background:rgba(22,33,62,.7);border:1px solid rgba(232,201,126,.12);border-radius:var(--radius);padding:20px;margin-bottom:16px;backdrop-filter:blur(8px);}
+  .card-gold{border-color:rgba(232,201,126,.3);}
+  .card-green{border-color:rgba(126,212,168,.3);background:rgba(126,212,168,.04);}
+  .card-accent{border-color:rgba(201,126,181,.3);background:rgba(201,126,181,.04);}
+  .card-mom{border-color:rgba(201,126,181,.4);background:linear-gradient(135deg,rgba(201,126,181,.08),rgba(232,201,126,.04));}
+
+  /* TYPE */
+  h1{font-family:'Playfair Display',serif;font-size:28px;line-height:1.2;}
+  h2{font-family:'Playfair Display',serif;font-size:22px;margin-bottom:8px;}
+  h3{font-family:'Playfair Display',serif;font-size:17px;margin-bottom:6px;}
+  .label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;display:block;}
+  .body-text{font-size:15px;line-height:1.6;color:#c9c4b5;}
+  .quote-text{font-family:'Playfair Display',serif;font-style:italic;font-size:16px;line-height:1.6;color:var(--gold);}
+  .hero{text-align:center;padding:28px 0 16px;}
+  .hero .eyebrow{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+  .hero h1 em{color:var(--gold);font-style:normal;}
+
+  /* BUTTONS */
+  .btn{display:block;width:100%;padding:13px 20px;border-radius:12px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;transition:all .2s;text-align:center;}
+  .btn-gold{background:var(--gold);color:var(--deep);}
+  .btn-gold:hover{background:#f0d88e;transform:translateY(-1px);}
+  .btn-outline{background:transparent;border:1px solid rgba(232,201,126,.4);color:var(--gold);}
+  .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,.1);color:var(--muted);}
+  .btn-accent{background:rgba(201,126,181,.15);border:1px solid rgba(201,126,181,.35);color:var(--accent);}
+  .btn-green{background:rgba(126,212,168,.15);border:1px solid rgba(126,212,168,.35);color:var(--green);}
+  .btn-mom{background:rgba(201,126,181,.2);border:1px solid rgba(201,126,181,.5);color:#e8b8e0;}
+  .btn-sm{display:inline-block;width:auto;padding:8px 16px;font-size:13px;}
+
+  /* INPUTS */
+  textarea,input[type="text"],input[type="password"]{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;padding:12px 14px;resize:none;transition:border-color .2s;}
+  textarea:focus,input:focus{outline:none;border-color:rgba(232,201,126,.5);}
+  textarea::placeholder,input::placeholder{color:var(--muted);}
+
+  /* UPLOAD */
+  .upload-zone{border:2px dashed rgba(232,201,126,.3);border-radius:14px;padding:28px 20px;text-align:center;cursor:pointer;transition:all .2s;position:relative;}
+  .upload-zone:hover{border-color:var(--gold);background:rgba(232,201,126,.04);}
+  .upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+  .upload-zone img{max-height:180px;border-radius:10px;margin:8px auto;display:block;}
+
+  /* AFFIRMATION */
+  .affirmation-box{background:linear-gradient(135deg,rgba(232,201,126,.08),rgba(201,126,181,.06));border:1px solid rgba(232,201,126,.2);border-radius:16px;padding:22px;text-align:center;margin-bottom:16px;}
+  .affirmation-text{font-family:'Playfair Display',serif;font-size:17px;line-height:1.6;color:var(--text);}
+
+  /* CHECKLIST */
+  .check-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;background:rgba(255,255,255,.03);margin-bottom:8px;cursor:pointer;transition:all .2s;border:1px solid transparent;}
+  .check-item:hover{background:rgba(255,255,255,.06);}
+  .check-item.checked{background:rgba(126,212,168,.05);border-color:rgba(126,212,168,.2);}
+  .check-item input[type="checkbox"]{accent-color:var(--gold);width:18px;height:18px;cursor:pointer;flex-shrink:0;}
+  .check-item label{cursor:pointer;font-size:14px;line-height:1.4;flex:1;}
+  .check-item.checked label{color:var(--muted);}
+
+  /* LESSON */
+  .lesson-item{display:flex;align-items:flex-start;gap:14px;padding:14px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);margin-bottom:10px;cursor:pointer;transition:all .2s;}
+  .lesson-item:hover{background:rgba(232,201,126,.05);border-color:rgba(232,201,126,.2);}
+  .lesson-item.done{border-color:rgba(126,212,168,.25);}
+  .lesson-item.locked{cursor:default;opacity:.45;}
+  .lesson-item.locked:hover{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.06);}
+  .lesson-item.current-lesson{border-color:rgba(232,201,126,.4);background:rgba(232,201,126,.05);}
+  .lesson-num{min-width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;background:rgba(232,201,126,.1);color:var(--gold);}
+  .lesson-num.done{background:rgba(126,212,168,.15);color:var(--green);}
+  .lesson-num.locked{background:rgba(255,255,255,.05);color:var(--muted);}
+  .lesson-num.current{background:rgba(232,201,126,.2);color:var(--gold);box-shadow:0 0 0 2px rgba(232,201,126,.3);}
+
+  /* STREAK */
+  .streak-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(232,201,126,.1);border:1px solid rgba(232,201,126,.25);border-radius:20px;padding:5px 12px;font-size:12px;color:var(--gold);font-weight:500;}
+
+  /* DOTS */
+  .step-dots{display:flex;gap:6px;justify-content:center;margin:14px 0;}
+  .dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.15);transition:all .3s;}
+  .dot.active{background:var(--gold);transform:scale(1.3);}
+  .dot.done{background:var(--green);}
+
+  /* TABS */
+  .tab-row{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px;}
+  .tab{padding:7px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:transparent;color:var(--muted);font-size:13px;cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;transition:all .2s;}
+  .tab.active{background:rgba(232,201,126,.12);border-color:rgba(232,201,126,.4);color:var(--gold);}
+
+  /* MODAL */
+  .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;align-items:center;justify-content:center;padding:20px;}
+  .modal-bg.open{display:flex;animation:fadeIn .25s ease;}
+  .modal{background:var(--mid);border-radius:20px;padding:24px;max-width:480px;width:100%;max-height:82vh;overflow-y:auto;border:1px solid rgba(232,201,126,.2);}
+
+  .spinner{width:36px;height:36px;border:3px solid rgba(232,201,126,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* WHO SCREEN */
+  .who-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:24px;}
+  .who-card{display:flex;flex-direction:column;align-items:center;gap:8px;padding:18px 10px;border-radius:16px;border:2px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);cursor:pointer;transition:all .25s;}
+  .who-card:hover{border-color:var(--gold);background:rgba(232,201,126,.07);}
+  .who-card.mom-card{border-color:rgba(201,126,181,.3);background:rgba(201,126,181,.06);}
+  .who-card.mom-card:hover{border-color:rgba(201,126,181,.7);background:rgba(201,126,181,.12);}
+  .who-avatar{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;}
+  .who-name{font-size:14px;font-weight:500;text-align:center;}
+
+  /* MESSAGES */
+  .msg-bubble{padding:10px 14px;border-radius:14px;margin-bottom:6px;max-width:88%;font-size:14px;line-height:1.5;}
+  .msg-child{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);align-self:flex-start;border-bottom-left-radius:4px;}
+  .msg-parent{background:rgba(232,201,126,.15);border:1px solid rgba(232,201,126,.25);align-self:flex-end;border-bottom-right-radius:4px;color:var(--gold);margin-left:auto;}
+  .msg-thread{display:flex;flex-direction:column;}
+  .msg-time{font-size:10px;color:var(--muted);margin-bottom:2px;}
+
+  .task-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;display:inline-block;}
+  .task-dot.done{background:var(--green);}
+  .task-dot.miss{background:rgba(255,255,255,.12);}
+
+  .pill{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;}
+  .pill-green{background:rgba(126,212,168,.15);color:var(--green);}
+  .pill-gold{background:rgba(232,201,126,.15);color:var(--gold);}
+  .pill-red{background:rgba(232,126,126,.15);color:var(--red);}
+
+  /* MOM DASHBOARD CHILD ROW */
+  .kid-summary{display:flex;align-items:center;gap:12px;padding:14px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);margin-bottom:10px;transition:all .2s;}
+  .kid-summary:hover{background:rgba(232,201,126,.04);border-color:rgba(232,201,126,.15);}
+
+  .flex{display:flex;}.items-center{align-items:center;}.gap-8{gap:8px;}.gap-12{gap:12px;}
+  .justify-between{justify-content:space-between;}.text-center{text-align:center;}
+  .text-gold{color:var(--gold);}.text-green{color:var(--green);}.text-muted{color:var(--muted);}
+  .mt-8{margin-top:8px}.mt-12{margin-top:12px}.mt-16{margin-top:16px}.mt-24{margin-top:24px}
+  .mb-8{margin-bottom:8px}.mb-12{margin-bottom:12px}.mb-16{margin-bottom:16px}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ══ WHO ARE YOU ══ -->
+<div id="screen-who" class="screen active">
+  <div class="hero" style="padding-top:40px">
+    <div style="font-size:44px;margin-bottom:10px">✨</div>
+    <div class="eyebrow">Welcome</div>
+    <h1>You Are<br/><em>Already It</em></h1>
+    <p class="body-text mt-12" style="max-width:260px;margin:12px auto 0;font-size:14px">Who's here today?</p>
+  </div>
+  <div class="who-grid" id="who-grid"></div>
+</div>
+
+<!-- ══ LOGIN (all users) ══ -->
+<div id="screen-mom-login" class="screen">
+  <div class="hero" style="padding-top:60px">
+    <div id="login-avatar" style="font-size:52px;margin-bottom:10px">✨</div>
+    <div class="eyebrow">Welcome back</div>
+    <h1 id="login-name" style="font-size:32px">Hey,<br/><em>you</em></h1>
+  </div>
+  <div class="card card-mom" style="max-width:320px;margin:0 auto" id="login-card">
+    <p class="body-text text-center mb-12" style="font-size:14px">Enter your passcode</p>
+    <input type="password" id="mom-passcode" maxlength="4" placeholder="••••" style="text-align:center;font-size:28px;letter-spacing:10px" onkeyup="if(event.key==='Enter')checkMomLogin()" />
+    <p style="color:var(--red);font-size:13px;text-align:center;margin-top:8px;min-height:18px" id="mom-login-error"></p>
+    <button class="btn btn-gold mt-12" onclick="checkMomLogin()">Enter ✨</button>
+    <button class="btn btn-ghost mt-8" onclick="showScreen('who')">← Back</button>
+  </div>
+</div>
+
+<!-- ══ HOME ══ -->
+<div id="screen-home" class="screen">
+  <div class="flex justify-between items-center" style="padding-top:16px;margin-bottom:4px">
+    <div><span class="label" style="margin-bottom:2px">Hapi Sun Up, My Famileeeee</span><h2 id="home-greeting" style="font-size:20px">Hapi Sun Up 💛</h2></div>
+    <div class="flex gap-8 items-center">
+      <div class="streak-badge">🔥 <span id="streak-num">0</span></div>
+      <button onclick="switchUser()" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:12px;padding:4px">switch</button>
+    </div>
+  </div>
+  <div class="affirmation-box">
+    <span class="label">Today's Truth</span>
+    <p class="affirmation-text" id="daily-quote"></p>
+    <p style="font-size:11px;color:var(--muted);margin-top:6px">— Neville Goddard</p>
+  </div>
+  <!-- Mom: reply notification (kids only) -->
+  <div class="card card-accent" id="mom-reply-card" style="display:none">
+    <div class="flex items-center gap-8 mb-8"><span style="font-size:20px">💌</span><span class="label" style="margin:0;color:var(--accent)">Mom replied to you</span></div>
+    <p class="body-text" id="mom-reply-preview" style="font-size:14px"></p>
+    <button class="btn btn-accent btn-sm mt-12" onclick="showScreen('checkin')">Read it →</button>
+  </div>
+  <!-- Mom: quick kids overview -->
+  <div id="mom-home-overview" style="display:none">
+    <div class="card card-mom">
+      <span class="label" style="color:var(--accent)">Your Kids Today</span>
+      <div id="mom-kids-mini"></div>
+      <button class="btn btn-mom btn-sm mt-12" onclick="showScreen('dashboard')">View Full Dashboard →</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="flex justify-between items-center mb-8"><h3>Today's Practice</h3><span id="home-check-count" class="text-gold" style="font-size:13px">0/5</span></div>
+    <div id="home-daily-items"></div>
+    <button class="btn btn-gold mt-12" onclick="showScreen('daily')">Open Daily Practice →</button>
+  </div>
+  <div class="card">
+    <span class="label">My Manifestation</span>
+    <div id="home-manifest-preview"></div>
+  </div>
+</div>
+
+<!-- ══ MANIFEST ══ -->
+<div id="screen-manifest" class="screen">
+  <div class="hero" style="padding-top:16px"><span class="eyebrow">Step Into Your Future</span><h1>Manifest<br/><em>Your Dream</em></h1></div>
+  <div class="step-dots" id="wizard-dots">
+    <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+
+  <!-- Step 0: Photo -->
+  <div id="wiz-0"><div class="card">
+    <h2>What do you dream of?</h2>
+    <p class="body-text mt-8 mb-12">Upload a picture that represents what you want — a feeling, a place, a life, anything that makes your heart say <em style="color:var(--gold)">yes</em>.</p>
+    <div class="upload-zone"><input type="file" accept="image/*" id="img-upload" onchange="handleImageUpload(this)" /><div id="upload-placeholder"><div style="font-size:32px;margin-bottom:8px">🌅</div><p style="color:var(--muted);font-size:14px">Tap to choose a photo</p></div><img id="upload-preview" style="display:none" /></div>
+    <button class="btn btn-gold mt-16" onclick="wizardNext(1)">Continue →</button>
+  </div></div>
+
+  <!-- Step 1: Vision -->
+  <div id="wiz-1" style="display:none"><div class="card">
+    <h2>Describe your vision</h2>
+    <p class="body-text mt-8 mb-12">Write it as if it's already true. <em style="color:var(--gold)">I am... I have... I feel...</em></p>
+    <textarea id="vision-text" rows="5" placeholder="I am living a life where I feel free and loved. I have peace. I feel confident every day..."></textarea>
+    <div class="mt-12 flex gap-8"><button class="btn btn-ghost" onclick="wizardNext(0)" style="width:80px">← Back</button><button class="btn btn-gold" onclick="wizardNext(2)">Continue →</button></div>
+  </div></div>
+
+  <!-- Step 2: Feeling -->
+  <div id="wiz-2" style="display:none"><div class="card">
+    <h2>How does it <em style="color:var(--gold)">feel?</em></h2>
+    <p class="body-text mt-8" style="font-size:14px">Neville said: <em style="color:var(--gold)">"Feeling is the secret."</em> Your feelings are the language your subconscious understands — not your words, not your wishes. <strong style="color:var(--text)">Feeling.</strong></p>
+    <div class="card" style="background:rgba(232,201,126,.05);border-color:rgba(232,201,126,.15);margin-top:12px;margin-bottom:12px;padding:14px">
+      <p style="font-size:13px;color:var(--gold);font-weight:500;margin-bottom:6px">Close your eyes for a moment and imagine...</p>
+      <p style="font-size:13px;color:#c9c4b5;line-height:1.7">Your manifestation has already come true. It's a regular Tuesday in your dream life. You wake up in the morning — what does your body feel like? When you look around, what's different? When someone asks how you're doing, what do you say? <em>That</em> feeling — right there — is what we're capturing.</p>
+    </div>
+    <div style="margin-bottom:12px"><p style="font-size:13px;color:var(--muted);margin-bottom:8px">Tap every feeling that would be true in that life:</p><div id="feeling-options"></div></div>
+    <textarea id="feeling-extra" rows="3" placeholder="Describe it deeper — what does your body feel like? What's the look on your face? What are you no longer worried about?"></textarea>
+    <div class="mt-12 flex gap-8"><button class="btn btn-ghost" onclick="wizardNext(1)" style="width:80px">← Back</button><button class="btn btn-gold" onclick="wizardNext(3)">Continue →</button></div>
+  </div></div>
+
+  <!-- Step 3: AI or DIY choice -->
+  <div id="wiz-3" style="display:none"><div class="card">
+    <h2>How do you want to <em style="color:var(--gold)">build</em> your plan?</h2>
+    <p class="body-text mt-8 mb-16" style="font-size:14px">Your vision is in — now choose how to turn it into a manifestation plan.</p>
+
+    <div onclick="choosePlanMode('ai')" style="cursor:pointer;padding:18px;border-radius:14px;border:2px solid rgba(232,201,126,.25);background:rgba(232,201,126,.05);margin-bottom:12px;transition:all .2s" onmouseover="this.style.borderColor='rgba(232,201,126,.6)'" onmouseout="this.style.borderColor='rgba(232,201,126,.25)'">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+        <span style="font-size:28px">✨</span>
+        <div><div style="font-weight:600;font-size:16px;color:var(--gold)">Guide me</div><div style="font-size:12px;color:var(--muted)">AI creates a personalized plan from your vision</div></div>
+      </div>
+      <p style="font-size:13px;color:#c9c4b5;line-height:1.6">Based on everything you just wrote, a plan will be created just for you — affirmations, things to think, say and do, and a bedtime scene. You can edit anything you want after.</p>
+    </div>
+
+    <div onclick="choosePlanMode('diy')" style="cursor:pointer;padding:18px;border-radius:14px;border:2px solid rgba(126,212,168,.2);background:rgba(126,212,168,.04);transition:all .2s" onmouseover="this.style.borderColor='rgba(126,212,168,.5)'" onmouseout="this.style.borderColor='rgba(126,212,168,.2)'">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+        <span style="font-size:28px">🌱</span>
+        <div><div style="font-weight:600;font-size:16px;color:var(--green)">I'll write it myself</div><div style="font-size:12px;color:var(--muted)">Guided prompts, your own words</div></div>
+      </div>
+      <p style="font-size:13px;color:#c9c4b5;line-height:1.6">You'll be walked through each piece with guiding questions. Every word of your plan comes straight from you — which makes it even more powerful.</p>
+    </div>
+
+    <button class="btn btn-ghost mt-12" onclick="wizardNext(2)">← Back</button>
+  </div></div>
+
+  <!-- Step 4a: AI Loading + Output -->
+  <div id="wiz-4-ai" style="display:none">
+    <div id="plan-loading" style="text-align:center;padding:40px">
+      <div class="spinner"></div>
+      <p class="body-text">Building your personal plan...</p>
+      <p style="font-size:13px;color:var(--muted);margin-top:8px">Tuning into the feeling of your wish fulfilled ✨</p>
+    </div>
+    <div id="plan-output" style="display:none">
+      <div class="card card-gold" style="margin-bottom:6px">
+        <span class="label">Your Manifestation</span>
+        <input id="plan-title-input" type="text" style="font-family:'Playfair Display',serif;font-size:20px;background:transparent;border:none;border-bottom:1px solid rgba(232,201,126,.3);border-radius:0;padding:4px 0;color:var(--text);width:100%;margin-bottom:8px" />
+        <textarea id="plan-intro-input" rows="3" style="font-size:14px;background:transparent;border:1px solid rgba(255,255,255,.08);margin-top:4px"></textarea>
+      </div>
+      <p style="font-size:11px;color:var(--muted);text-align:right;margin-bottom:12px;margin-top:-8px">✏️ Tap any field to edit</p>
+
+      <div class="card">
+        <h3>🙏 Gratitude Bridge</h3>
+        <p class="body-text mb-8" style="font-size:13px">You are already living yesterday's prayer. Be grateful for what you have NOW while praying for what's next.</p>
+        <div id="plan-gratitude-edit"></div>
+        <button class="btn btn-ghost btn-sm mt-8" onclick="addPlanItem('gratitude')">+ Add one</button>
+      </div>
+
+      <div class="card">
+        <h3>💬 Your Affirmations</h3>
+        <p class="body-text mb-8" style="font-size:13px">Say these OUT LOUD and feel them as already true:</p>
+        <div id="plan-affirmations-edit"></div>
+        <button class="btn btn-ghost btn-sm mt-8" onclick="addPlanItem('affirmation')">+ Add one</button>
+      </div>
+
+      <div class="card">
+        <h3>🌀 Act As If It's Already True</h3>
+        <div class="tab-row">
+          <button class="tab active" onclick="switchManifestTab(this,'think')">Think</button>
+          <button class="tab" onclick="switchManifestTab(this,'act')">Act</button>
+          <button class="tab" onclick="switchManifestTab(this,'speak')">Speak</button>
+        </div>
+        <div id="tab-think"><div id="plan-think-edit"></div><button class="btn btn-ghost btn-sm mt-8" onclick="addPlanItem('think')">+ Add one</button></div>
+        <div id="tab-act" style="display:none"><div id="plan-act-edit"></div><button class="btn btn-ghost btn-sm mt-8" onclick="addPlanItem('act')">+ Add one</button></div>
+        <div id="tab-speak" style="display:none"><div id="plan-speak-edit"></div><button class="btn btn-ghost btn-sm mt-8" onclick="addPlanItem('speak')">+ Add one</button></div>
+      </div>
+
+      <div class="card" style="background:linear-gradient(135deg,rgba(13,13,26,.9),rgba(26,26,46,.8))">
+        <h3>🌙 Your Bedtime Scene</h3>
+        <div style="background:rgba(232,201,126,.06);border:1px solid rgba(232,201,126,.15);border-radius:10px;padding:12px;margin-bottom:12px">
+          <p style="font-size:12px;color:var(--gold);font-weight:500;margin-bottom:4px">What is this?</p>
+          <p style="font-size:13px;color:#c9c4b5;line-height:1.6">Neville called it SATS — the State Akin To Sleep. In the drowsy moments <em>right before you drift off</em>, your subconscious is wide open. Whatever feeling you hold in that state gets planted like a seed. This is your scene to imagine every night. You'll learn the full technique in an upcoming lesson.</p>
+        </div>
+        <textarea id="plan-sats-input" rows="5" style="font-family:'Playfair Display',serif;font-style:italic;font-size:14px;line-height:1.7;color:var(--gold);background:rgba(255,255,255,.04);border-color:rgba(232,201,126,.2)"></textarea>
+      </div>
+
+      <button class="btn btn-gold" onclick="savePlanFromEditor()">Save My Plan & Begin ✨</button>
+      <div style="height:20px"></div>
+    </div>
+  </div>
+
+  <!-- Step 4b: DIY guided prompts -->
+  <div id="wiz-4-diy" style="display:none">
+    <div class="card card-gold">
+      <span class="label">You're writing this yourself 🌱</span>
+      <p class="body-text" style="font-size:13px">Every prompt below is a guiding question. Take your time. The more honest and specific you are, the more powerful this plan becomes. <em style="color:var(--gold)">There are no wrong answers.</em></p>
+    </div>
+
+    <div class="card">
+      <h3>✨ Name Your Dream</h3>
+      <p class="body-text mb-8" style="font-size:13px">Give your manifestation a short title — like a name for this chapter of your life.</p>
+      <input type="text" id="diy-title" placeholder="e.g. My Peaceful, Abundant Life" />
+    </div>
+
+    <div class="card">
+      <h3>🙏 Gratitude Bridge</h3>
+      <p class="body-text mb-8" style="font-size:13px">Right now, even in the middle of hard things — what 3 things do you already have that were once a prayer or a wish? Even small ones count.</p>
+      <textarea id="diy-gratitude-1" rows="2" placeholder="I am grateful for..." style="margin-bottom:8px"></textarea>
+      <textarea id="diy-gratitude-2" rows="2" placeholder="I am grateful for..." style="margin-bottom:8px"></textarea>
+      <textarea id="diy-gratitude-3" rows="2" placeholder="I am grateful for..."></textarea>
+    </div>
+
+    <div class="card">
+      <h3>💬 Your Affirmations</h3>
+      <p class="body-text mb-8" style="font-size:13px">Write 3–5 statements that declare your dream is already real. Start each with <em style="color:var(--gold)">"I AM"</em> or <em style="color:var(--gold)">"I have"</em> or <em style="color:var(--gold)">"I feel."</em> Write them as truth, not as wishes.</p>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:8px">Ask yourself: if my dream were already real, what would I say about myself?</p>
+      <textarea id="diy-affirmations" rows="6" placeholder="I AM free and at peace in my life.&#10;I HAVE the love and support I always wanted.&#10;I FEEL confident walking into any room.&#10;I AM someone who keeps their promises to themselves.&#10;I HAVE everything I need to live the life I dream of."></textarea>
+    </div>
+
+    <div class="card">
+      <h3>🧠 What Will You Think?</h3>
+      <p class="body-text mb-8" style="font-size:13px">Write 2–3 thoughts you will practice thinking about yourself every day — as if your dream is already true. What does your future self think about themselves?</p>
+      <textarea id="diy-think" rows="4" placeholder="e.g. I am the kind of person who attracts good things.&#10;I don't have to fight for love — I receive it naturally.&#10;Things always work out for me."></textarea>
+    </div>
+
+    <div class="card">
+      <h3>⚡ What Will You Do?</h3>
+      <p class="body-text mb-8" style="font-size:13px">Write 2–3 small things you can do EVERY DAY that your future self — the one already living the dream — would do. Not big things. Small, real, daily.</p>
+      <textarea id="diy-act" rows="4" placeholder="e.g. I will walk with my head up and shoulders back.&#10;I will speak kindly to myself in the mirror.&#10;I will not scroll into negativity before bed."></textarea>
+    </div>
+
+    <div class="card">
+      <h3>💬 What Will You Say?</h3>
+      <p class="body-text mb-8" style="font-size:13px">Write 2–3 things you will actually say out loud — to yourself, to others — as if your dream is already happening.</p>
+      <textarea id="diy-speak" rows="4" placeholder="e.g. 'Things are really starting to shift for me.'&#10;'I'm proud of who I'm becoming.'&#10;'I don't settle for less than I deserve.'"></textarea>
+    </div>
+
+    <div class="card" style="background:linear-gradient(135deg,rgba(13,13,26,.9),rgba(26,26,46,.8))">
+      <h3>🌙 Your Bedtime Scene</h3>
+      <div style="background:rgba(232,201,126,.06);border:1px solid rgba(232,201,126,.15);border-radius:10px;padding:12px;margin-bottom:12px">
+        <p style="font-size:12px;color:var(--gold);font-weight:500;margin-bottom:4px">What is this?</p>
+        <p style="font-size:13px;color:#c9c4b5;line-height:1.6">Neville called it SATS — the State Akin To Sleep. Right before you drift off, your subconscious is wide open. You're going to write a short scene to imagine every night — a simple, warm, real moment that could ONLY be happening if your dream already came true. You'll learn the full technique in an upcoming lesson.</p>
+      </div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:8px">Imagine it's a normal night in your dream life. Describe what you see, feel, hear. Make it simple and specific — like a movie scene that lasts 30 seconds.</p>
+      <textarea id="diy-sats" rows="5" style="font-family:'Playfair Display',serif;font-style:italic;font-size:14px;line-height:1.7;color:var(--gold);background:rgba(255,255,255,.04);border-color:rgba(232,201,126,.2)" placeholder="e.g. I am lying in bed in my own place. It's quiet. There's a candle on the nightstand. I feel safe. My phone has a message from someone I love. I smile and close my eyes..."></textarea>
+    </div>
+
+    <button class="btn btn-gold" onclick="saveDiyPlan()">Save My Plan & Begin ✨</button>
+    <button class="btn btn-ghost mt-8" onclick="wizardNext(3)">← Back</button>
+    <div style="height:20px"></div>
+  </div>
+</div>
+
+<!-- ══ DAILY ══ -->
+<div id="screen-daily" class="screen">
+  <div class="hero" style="padding-top:16px"><span class="eyebrow">Daily Practice</span><h1>Your<br/><em>Daily Work</em></h1></div>
+  <div class="card card-gold"><span class="label">Today's Lesson</span><h3 id="todays-lesson-title"></h3><p class="body-text mt-8" id="todays-lesson-body"></p><button class="btn btn-outline mt-12 btn-sm" onclick="openLessonModal()">Read Full Lesson →</button></div>
+  <div class="affirmation-box"><span class="label">Today's Affirmation</span><p class="affirmation-text" id="daily-affirmation-text">Loading...</p><button class="btn btn-accent btn-sm mt-12" onclick="speakAffirmation()">🔊 Hear it</button></div>
+  <div class="card">
+    <div class="flex justify-between items-center mb-8"><h3>Practice Checklist</h3><span id="check-progress" class="text-gold" style="font-size:13px">0 / 5</span></div>
+    <div id="daily-checklist"></div>
+  </div>
+  <div class="card">
+    <h3>🙏 Gratitude Moment</h3>
+    <p class="body-text mt-8 mb-8" style="font-size:13px">Write 3 things from your life that are yesterday's prayers answered:</p>
+    <textarea id="gratitude-journal" rows="4" placeholder="1. I am grateful for...&#10;2. I am grateful for...&#10;3. I am grateful for..."></textarea>
+    <button class="btn btn-outline mt-8 btn-sm" onclick="saveGratitude()">Save ✓</button>
+  </div>
+</div>
+
+<!-- ══ LESSONS ══ -->
+<div id="screen-lessons" class="screen">
+  <div class="hero" style="padding-top:16px"><span class="eyebrow">Your Journey</span><h1>The<br/><em>21 Teachings</em></h1></div>
+  <p class="body-text mb-4" style="font-size:14px">One lesson at a time. Complete each one to unlock the next — but you can always revisit any lesson you've already finished.</p>
+  <div id="lessons-list"></div>
+</div>
+
+<!-- ══ CHECK-IN (kids) / MOM DASHBOARD ══ -->
+<div id="screen-checkin" class="screen">
+  <!-- Kid view -->
+  <div id="kid-checkin-view">
+    <div class="hero" style="padding-top:16px"><span class="eyebrow">Check In</span><h1>Share With<br/><em>Mom</em></h1></div>
+    <div class="card card-gold">
+      <span class="label">Today's Report</span>
+      <div id="checkin-summary"></div>
+      <div class="mt-12">
+        <p class="body-text mb-8" style="font-size:13px">Want to share more details with Mom?</p>
+        <div class="flex gap-8">
+          <button class="btn btn-green btn-sm" id="btn-share-yes" onclick="toggleShareDetails(true)">Yes, share details</button>
+          <button class="btn btn-ghost btn-sm" id="btn-share-no" onclick="toggleShareDetails(false)">Keep private</button>
+        </div>
+      </div>
+      <div id="checkin-detail-section" style="display:none;margin-top:12px">
+        <p style="font-size:12px;color:var(--muted);margin-bottom:6px">Mom will see your task completion and gratitude notes.</p>
+        <div style="background:rgba(126,212,168,.07);border:1px solid rgba(126,212,168,.2);border-radius:10px;padding:12px;font-size:13px;color:#a8e8c8" id="shared-detail-preview"></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>💌 Send Mom a Message</h3>
+      <p class="body-text mt-8 mb-8" style="font-size:13px">Optional — a win, a struggle, anything on your mind.</p>
+      <textarea id="msg-to-mom" rows="3" placeholder="Hey Mom, today I..."></textarea>
+      <button class="btn btn-gold mt-12" onclick="sendCheckin()">Send Check-In ✓</button>
+    </div>
+    <div class="card card-accent" id="reply-thread-card" style="display:none">
+      <h3>💜 From Mom</h3>
+      <div class="msg-thread mt-12" id="msg-thread-child"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MOM DASHBOARD (separate screen) ══ -->
+<div id="screen-dashboard" class="screen">
+  <div class="hero" style="padding-top:16px">
+    <div style="font-size:32px;margin-bottom:8px">💜</div>
+    <span class="eyebrow">Mom's View</span>
+    <h1>Your<br/><em>Dashboard</em></h1>
+  </div>
+  <div class="tab-row" style="margin-bottom:16px">
+    <button class="tab active" onclick="dashTab(this,'today')">Today</button>
+    <button class="tab" onclick="dashTab(this,'history')">History</button>
+    <button class="tab" id="dtab-messages" onclick="dashTab(this,'messages')">Messages</button>
+  </div>
+  <div id="dash-today"></div>
+  <div id="dash-history" style="display:none"></div>
+  <div id="dash-messages" style="display:none"></div>
+</div>
+
+<!-- ══ JOURNAL ══ -->
+<div id="screen-journal" class="screen">
+  <div class="hero" style="padding-top:16px"><span class="eyebrow">Evidence</span><h1>My<br/><em>Proof Book</em></h1></div>
+  <p class="body-text mb-16" style="font-size:14px">Every time something shifts — write it here. You're collecting proof that this works.</p>
+  <div class="card"><textarea id="new-entry" rows="4" placeholder="Something shifted today... I noticed... I felt..."></textarea><button class="btn btn-gold mt-8" onclick="addJournalEntry()">Add Entry ✓</button></div>
+  <div id="journal-entries"></div>
+</div>
+
+</div><!-- /app -->
+
+<!-- ══ NAV (kids: 5 tabs | mom: 6 tabs) ══ -->
+<nav class="bottom-nav" id="main-nav" style="display:none">
+  <button class="nav-btn active" data-target="home" onclick="showScreen('home',this)">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>Home
+  </button>
+  <button class="nav-btn" data-target="manifest" onclick="showScreen('manifest',this)">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>Manifest
+  </button>
+  <button class="nav-btn" data-target="daily" onclick="showScreen('daily',this)">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>Daily
+  </button>
+  <!-- Kids: Check In | Mom: Dashboard -->
+  <button class="nav-btn" id="nav-checkin-btn" data-target="checkin" onclick="showScreen('checkin',this)">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+    <div class="nav-dot" id="checkin-dot"></div>
+    <span id="nav-checkin-label">Check In</span>
+  </button>
+  <button class="nav-btn" data-target="lessons" onclick="showScreen('lessons',this)">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Lessons
+  </button>
+  <!-- Mom only: Dashboard tab -->
+  <button class="nav-btn" id="nav-dashboard-btn" data-target="dashboard" onclick="showScreen('dashboard',this)" style="display:none">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M3 12h3M18 12h3M12 3v3M12 18v3M5.64 5.64l2.12 2.12M16.24 16.24l2.12 2.12M5.64 18.36l2.12-2.12M16.24 7.76l2.12-2.12"/></svg>
+    <div class="nav-dot" id="dash-dot"></div>Kids
+  </button>
+</nav>
+
+<!-- MODALS -->
+<div class="modal-bg" id="lesson-modal">
+  <div class="modal">
+    <div class="flex justify-between items-center mb-16"><h2 id="modal-lesson-title">Lesson</h2><button onclick="closeModal('lesson-modal')" style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer">✕</button></div>
+    <p class="quote-text mb-12" id="modal-lesson-quote"></p>
+    <p class="body-text" id="modal-lesson-body"></p>
+    <div class="mt-12" id="modal-lesson-practice"></div>
+    <button class="btn btn-gold mt-16" id="modal-complete-btn" onclick="markLessonDone()">I did the practice — Mark Complete ✓</button>
+    <div id="modal-revisit-note" style="display:none;margin-top:16px;text-align:center;padding:12px;background:rgba(126,212,168,.06);border:1px solid rgba(126,212,168,.2);border-radius:12px">
+      <p style="font-size:13px;color:var(--green)">✓ You've already completed this lesson. Revisiting is always welcome.</p>
+      <button class="btn btn-ghost btn-sm mt-8" onclick="closeModal('lesson-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ONBOARDING MODAL ══ -->
+<div class="modal-bg" id="onboarding-modal">
+  <div class="modal" style="max-width:420px;padding:0;overflow:hidden;border:1px solid rgba(232,201,126,.25)">
+
+    <!-- Slide container -->
+    <div id="ob-slides" style="position:relative;min-height:380px">
+
+      <!-- Slide 1 -->
+      <div class="ob-slide" id="ob-0" style="padding:32px 28px 24px;text-align:center">
+        <div style="font-size:52px;margin-bottom:16px">✨</div>
+        <h2 style="margin-bottom:10px">Welcome to<br/><em style="color:var(--gold)">You Are Already It</em></h2>
+        <p class="body-text" style="font-size:14px;line-height:1.7">This app is built on one simple truth: <strong style="color:var(--text)">your life tomorrow is shaped by what you believe today.</strong> You are not at the mercy of your circumstances. You are the creator of them.</p>
+        <p class="body-text mt-12" style="font-size:13px;color:var(--muted)">This is your daily practice to prove it.</p>
+      </div>
+
+      <!-- Slide 2 -->
+      <div class="ob-slide" id="ob-1" style="display:none;padding:32px 28px 24px">
+        <div style="font-size:40px;margin-bottom:14px;text-align:center">🌅</div>
+        <h2 style="text-align:center;margin-bottom:16px">Start with your <em style="color:var(--gold)">Manifestation</em></h2>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <span style="font-size:20px;flex-shrink:0">📸</span>
+            <p style="font-size:14px;line-height:1.6;color:#c9c4b5"><strong style="color:var(--text)">Upload a photo</strong> that represents the life you want. It can be a place, a feeling, a vibe — anything that makes your heart say yes.</p>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <span style="font-size:20px;flex-shrink:0">✍️</span>
+            <p style="font-size:14px;line-height:1.6;color:#c9c4b5"><strong style="color:var(--text)">Describe it</strong> as if it's already true. Not "I want" — write "I am. I have. I feel."</p>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <span style="font-size:20px;flex-shrink:0">✨</span>
+            <p style="font-size:14px;line-height:1.6;color:#c9c4b5"><strong style="color:var(--text)">Get your plan</strong> — affirmations, daily actions, and a bedtime scene to plant the seed every night.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 3 -->
+      <div class="ob-slide" id="ob-2" style="display:none;padding:32px 28px 24px">
+        <div style="font-size:40px;margin-bottom:14px;text-align:center">📅</div>
+        <h2 style="text-align:center;margin-bottom:16px">Do your <em style="color:var(--gold)">Daily Practice</em></h2>
+        <p class="body-text mb-12" style="font-size:13px">Every day has 5 simple things. None of them take long. All of them add up.</p>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="check-item" style="pointer-events:none"><input type="checkbox" checked disabled /><label>📖 Read today's lesson</label></div>
+          <div class="check-item" style="pointer-events:none"><input type="checkbox" checked disabled /><label>🌅 Morning: feel your wish fulfilled for 2 minutes</label></div>
+          <div class="check-item" style="pointer-events:none"><input type="checkbox" disabled /><label>🙏 Write 3 things you're grateful for</label></div>
+          <div class="check-item" style="pointer-events:none"><input type="checkbox" disabled /><label>💬 Say your affirmation out loud</label></div>
+          <div class="check-item" style="pointer-events:none"><input type="checkbox" disabled /><label>🌙 SATS — hold your dream scene as you drift off</label></div>
+        </div>
+      </div>
+
+      <!-- Slide 4: Kids version -->
+      <div class="ob-slide" id="ob-3-kids" style="display:none;padding:32px 28px 24px">
+        <div style="font-size:40px;margin-bottom:14px;text-align:center">💌</div>
+        <h2 style="text-align:center;margin-bottom:16px">Check in with <em style="color:var(--gold)">Mom</em></h2>
+        <p class="body-text mb-16" style="font-size:14px;line-height:1.7">After your daily practice, tap <strong style="color:var(--text)">Check In</strong> to let Mom know how you did. She can see which tasks you completed — nothing more unless you choose to share.</p>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <span style="font-size:18px;flex-shrink:0">🔒</span>
+            <p style="font-size:13px;color:#c9c4b5;line-height:1.5">Your journal and manifestation plan are <strong style="color:var(--text)">always private</strong> — Mom never sees them unless you share.</p>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <span style="font-size:18px;flex-shrink:0">💬</span>
+            <p style="font-size:13px;color:#c9c4b5;line-height:1.5">You can send Mom an optional message — a win, a struggle, whatever's on your mind. She can reply.</p>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <span style="font-size:18px;flex-shrink:0">✅</span>
+            <p style="font-size:13px;color:#c9c4b5;line-height:1.5">You control how much you share. Task checkmarks are automatic — everything else is your choice.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 4: Mom version -->
+      <div class="ob-slide" id="ob-3-mom" style="display:none;padding:32px 28px 24px">
+        <div style="font-size:40px;margin-bottom:14px;text-align:center">💜</div>
+        <h2 style="text-align:center;margin-bottom:16px">You're doing this <em style="color:var(--gold)">too</em></h2>
+        <p class="body-text mb-12" style="font-size:14px;line-height:1.7">This isn't just for the kids. Your practice is your own — separate from theirs, completely private.</p>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <span style="font-size:18px;flex-shrink:0">🌱</span>
+            <p style="font-size:13px;color:#c9c4b5;line-height:1.5">Create your own manifestation plan. Do your own daily practice. Keep your own proof book.</p>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <span style="font-size:18px;flex-shrink:0">👁️</span>
+            <p style="font-size:13px;color:#c9c4b5;line-height:1.5">The <strong style="color:var(--text)">Kids tab</strong> shows you their daily check-ins — task dots, any messages they send, and lets you reply.</p>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <span style="font-size:18px;flex-shrink:0">💌</span>
+            <p style="font-size:13px;color:#c9c4b5;line-height:1.5">Their journals and plans stay private unless they choose to share. You see what they give you.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 5 -->
+      <div class="ob-slide" id="ob-4" style="display:none;padding:32px 28px 24px;text-align:center">
+        <div style="font-size:52px;margin-bottom:16px" id="ob-final-emoji">✨</div>
+        <h2 style="margin-bottom:12px">You are <em style="color:var(--gold)">already it</em></h2>
+        <p class="body-text mb-16" style="font-size:14px;line-height:1.7">You don't have to become someone new. You just have to start believing in who you already are — and who you're becoming.</p>
+        <div style="background:rgba(232,201,126,.08);border:1px solid rgba(232,201,126,.2);border-radius:12px;padding:16px;margin-bottom:20px">
+          <p class="quote-text" style="font-size:14px">"You are already that which you want to be. Your refusal to believe this is the only reason you do not see it."</p>
+          <p style="font-size:11px;color:var(--muted);margin-top:6px">— Neville Goddard</p>
+        </div>
+        <button class="btn btn-gold" onclick="finishOnboarding()">Let's go ✨</button>
+      </div>
+
+    </div>
+
+    <!-- Bottom nav -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-top:1px solid rgba(255,255,255,.07)">
+      <button id="ob-back-btn" onclick="obNav(-1)" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;font-family:'DM Sans',sans-serif;padding:4px 0" disabled>← Back</button>
+      <div style="display:flex;gap:6px;align-items:center" id="ob-dots-nav"></div>
+      <button id="ob-next-btn" onclick="obNav(1)" style="background:none;border:none;color:var(--gold);cursor:pointer;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;padding:4px 0">Next →</button>
+    </div>
+  </div>
+</div>
+<!-- ══ API KEY SETUP MODAL ══ -->
+<div class="modal-bg" id="apikey-modal">
+  <div class="modal" style="max-width:380px">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:36px;margin-bottom:8px">🔑</div>
+      <h2>One-time Setup</h2>
+      <p class="body-text mt-8" style="font-size:14px;line-height:1.7">To generate personalized AI plans, paste your Anthropic API key below. It's stored <strong style="color:var(--text)">only on this device</strong> — never in the code or on GitHub.</p>
+    </div>
+    <div style="background:rgba(232,201,126,.06);border:1px solid rgba(232,201,126,.15);border-radius:10px;padding:12px;margin-bottom:16px">
+      <p style="font-size:12px;color:var(--gold);font-weight:500;margin-bottom:6px">How to get your key:</p>
+      <p style="font-size:12px;color:#c9c4b5;line-height:1.8">1. Go to <strong style="color:var(--text)">console.anthropic.com</strong><br/>2. Sign up for a free account<br/>3. Click "API Keys" → "Create Key"<br/>4. Copy and paste it below<br/><em style="color:var(--muted)">You get $5 free credit — enough for years of family use.</em></p>
+    </div>
+    <p style="color:var(--red);font-size:13px;margin-bottom:8px;min-height:18px" id="apikey-error"></p>
+    <input type="password" id="apikey-input" placeholder="sk-ant-..." style="font-size:13px;letter-spacing:1px" />
+    <button class="btn btn-gold mt-12" onclick="saveApiKey()">Save Key & Generate Plan ✨</button>
+    <button class="btn btn-ghost mt-8" onclick="closeModal('apikey-modal');document.getElementById('wiz-4-diy').style.display='block';">I'll write it myself instead →</button>
+  </div>
+</div>
+
+<!-- ══ PARENT REPLY MODAL ══ -->
+<div class="modal-bg" id="parent-reply-modal">
+  <div class="modal" style="max-width:400px">
+    <div class="flex justify-between items-center mb-12"><h2 id="reply-modal-title">Reply</h2><button onclick="closeModal('parent-reply-modal')" style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer">✕</button></div>
+    <div id="reply-msg-preview" class="card" style="margin-bottom:12px;font-size:14px;color:var(--muted)"></div>
+    <textarea id="parent-reply-text" rows="4" placeholder="Write your reply..."></textarea>
+    <button class="btn btn-gold mt-12" onclick="sendParentReply()">Send Reply 💜</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+//  CONFIG
+// ══════════════════════════════════════
+const MOM_ID   = 'mom';
+const MOM_CODE = '1976';
+
+const ALL_USERS = [
+  { id:'mom',   name:'Mom',   emoji:'💜', color:'#c97eb5', isMom:true,  code:'1976' },
+  { id:'lexi',  name:'Lexi',  emoji:'🌟', color:'#e8c97e', isMom:false, code:'5555' },
+  { id:'sophie',name:'Sophie',emoji:'🌸', color:'#c97eb5', isMom:false, code:'4444' },
+  { id:'alec',  name:'Alec',  emoji:'⚡', color:'#7ed4a8', isMom:false, code:'3333' },
+  { id:'tony',  name:'Tony',  emoji:'🌙', color:'#7eb5e8', isMom:false, code:'2222' },
+  { id:'nic',   name:'Nic',   emoji:'🔥', color:'#e8a07e', isMom:false, code:'1111' },
+];
+const KIDS = ALL_USERS.filter(u => !u.isMom);
+
+// ══════════════════════════════════════
+//  CONTENT
+// ══════════════════════════════════════
+const DAILY_QUOTES = [
+  "You are already that which you want to be. Your refusal to believe this is the only reason you do not see it.",
+  "Feeling is the secret.",
+  "An assumption, though false, if persisted in, will harden into fact.",
+  "Persist in the feeling of the wish fulfilled and it will materialize.",
+  "Go to the end. Imagine yourself there. Feel the naturalness of it.",
+  "Change your conception of yourself and you will automatically change the world you live in.",
+  "Imagination creates reality.",
+];
+const FEELINGS = ["Free","Proud","Loved","Peaceful","Excited","Confident","Safe","Joyful","Grateful","Powerful","Seen","Enough"];
+const LESSONS = [
+  {id:1,title:"You Are Already It",short:"Your outer world is a mirror of your inner world. Change the inner and the outer must follow.",quote:'"You are already that which you want to be. Your refusal to believe this is the only reason you do not see it."',body:"Neville taught that reality is consciousness made visible. Everything you see outside you is a printout of what you believe inside. People who believe they're unlucky keep having bad luck. People who believe they're loved keep attracting love. The outer world is just a mirror.",practice:"Today: Look in a real mirror and say out loud — 'I AM enough. I AM capable. I AM already becoming what I dream.'"},
+  {id:2,title:"Yesterday's Prayers",short:"Where you are today is what you once believed and wished for. Be grateful, then pray for what's next.",quote:'"You are living yesterday\'s prayers."',body:"The life you're in RIGHT NOW was once something you hoped for. Even if it's hard, something about it was once a wish. The moment you realize this, you stop fighting where you are and start being grateful for how far you've come — AND start imagining where you're going next.",practice:"Write down 3 things in your life right now that were once a wish or a dream, even a small one."},
+  {id:3,title:"Feeling Is the Secret",short:"It's not what you think — it's what you FEEL as real. Feeling is the language your subconscious understands.",quote:'"Feeling is the secret."',body:"You can repeat affirmations all day, but if you feel like they're lies, nothing changes. The subconscious responds to FEELINGS. When you imagine your dream and actually FEEL the joy — as if it's happening RIGHT NOW — that feeling is what creates.",practice:"Close your eyes. Imagine one thing you want. Now feel what it would feel like to already have it. Stay in that feeling for 2 minutes."},
+  {id:4,title:"Live In the End",short:"Don't imagine the journey to your goal. Imagine yourself ALREADY THERE.",quote:'"Go to the end. Imagine yourself there. Feel the naturalness of it."',body:"Skip the steps — go straight to the END. If you want to feel safe and loved, don't imagine the 10 things that would make it happen. Just imagine yourself already feeling safe and loved. The subconscious will find the path — your only job is to FEEL the destination.",practice:"Imagine a scene that could ONLY happen if your dream came true. Play it in your mind like a short movie. Keep it simple and real."},
+  {id:5,title:"Your Assumption Becomes Fact",short:"Whatever you persistently assume about yourself hardens into your reality.",quote:'"An assumption, though false, if persisted in, will harden into fact."',body:"EVERYTHING you assume — 'I'm bad at this,' 'nothing works out for me' — those are creating your life. But so are 'I'm getting better,' 'things are turning around.' You get to choose which assumptions you feed.",practice:"Catch yourself in one negative assumption today. Write it down. Then rewrite it as if the opposite were true."},
+  {id:6,title:"Everyone Is You Pushed Out",short:"The way people treat you reflects what you believe about yourself.",quote:'"Everyone in your world is a reflection of a state of consciousness in you."',body:"When someone hurts you — they're reflecting back a belief YOU hold about yourself. Not to blame you — but to FREE you. If YOU change what you believe about yourself, the people around you change their behavior.",practice:"Think of someone whose behavior bothers you. What belief about yourself might be reflected there? Rewrite the belief."},
+  {id:7,title:"Revision",short:"You can rewrite the past in your imagination. A revised past creates a new future.",quote:'"Revise the day. Rehearse it as you wish it had been."',body:"At the end of each day, replay any moment that went badly — but this time, imagine it going the way you wished. Your brain can't fully tell the difference between a real memory and a vividly imagined one. You're literally editing your story.",practice:"Tonight before bed, pick one moment that didn't go well. Replay it — but this time, it goes perfectly."},
+  {id:8,title:"The SATS Technique",short:"The moment between awake and asleep is the most powerful time to impress your subconscious.",quote:'"Enter the drowsy, sleepy state and whisper the feeling of your wish fulfilled."',body:"SATS = State Akin To Sleep. Right before you fall asleep, your subconscious is wide open. In that state, imagine a scene that means your wish came true. Just one simple scene. Feel it. Then drift off.",practice:"Tonight: As you fall asleep, hold ONE image or feeling of your dream being real. Gently feel it as you drift off."},
+  {id:9,title:"I AM Is Your Creative Power",short:"Whatever you say after 'I AM' you are creating. Use it wisely.",quote:'"I AM is the name of God within you. Use it wisely."',body:"'I am always broke. I am not good enough.' — these are creation commands. So are: 'I am becoming. I am loved. I am capable. I am enough.' You don't have to believe it fully at first — just stop telling the old story.",practice:"For one hour today, notice every time you say 'I am...' Replace any negative ones with empowering ones."},
+  {id:10,title:"The Mental Diet",short:"Guard your thoughts like your life depends on it — because it does.",quote:'"Diet not of foods but of thoughts. What are you feeding your mind?"',body:"Negative thoughts and self-criticism are mental poison. Neville taught a strict mental diet: only allow thoughts that serve what you want. You can notice a problem without camping in it.",practice:"Set a reminder for every 2 hours today. When it goes off, notice your thoughts. Are they creating what you want or what you fear? Gently shift."},
+  {id:11,title:"Prayer Is Feeling, Not Asking",short:"True prayer is feeling as if you already have what you want.",quote:'"Prayer is the art of assuming the feeling of being and having what you want."',body:"Most people pray from lack: 'Please give me this.' But that feeling creates MORE lack. Real prayer is stepping INTO the feeling of already having it. It's gratitude before the evidence arrives.",practice:"Tonight, instead of asking, thank the universe as if it's already here. 'Thank you that I have... Thank you that I am...'"},
+  {id:12,title:"Your Imagination Creates Reality",short:"The imagination is the workshop where reality is built before it appears.",quote:'"Imagination is the beginning of creation."',body:"The phone you're reading this on was imagination before it was real. Every building was imagined first. YOUR future is in your imagination right now. The question is: what are you imagining?",practice:"Spend 5 minutes today in pure positive imagination about your ideal life. Not worry, not planning — just let yourself really want it and feel it."},
+  {id:13,title:"Don't Fight What Is",short:"Fighting your current reality gives it more power. Acknowledge it, then turn to what you're creating.",quote:'"Change your conception of yourself and you will automatically change the world you live in."',body:"Every second you spend fighting or obsessing about what you don't want, you're strengthening it. Acknowledge reality briefly, then deliberately shift your attention to what you ARE creating.",practice:"Write down one thing you've been fighting. Then write one sentence about what you're creating INSTEAD."},
+  {id:14,title:"Persist in Your Assumption",short:"Most people give up right before the breakthrough.",quote:'"Persist in the feeling of the wish fulfilled and it will materialize."',body:"People plant a seed, check the next day, see dirt, and declare 'it doesn't work!' Persistence is everything. You STAY in your belief when things look different. You keep feeling it as real. And then — seemingly out of nowhere — it shows up.",practice:"Think of a dream you've given up on. Is it really impossible, or did you stop believing before it arrived? Give it one more chance."},
+  {id:15,title:"Be Grateful Every Moment",short:"Gratitude is a manifestation superpower. Grateful people attract more to be grateful for.",quote:'"Gratitude is the open door to abundance."',body:"When you're truly grateful, you're NOT in a state of lack. Even in hard times, you can find things: a warm bed, a friend who texted, a sunset, food to eat. The more you find, the more there is to find.",practice:"Write a list of 10 things you're grateful for RIGHT NOW. Go as small and specific as you like. Feel the gratitude as you write."},
+  {id:16,title:"Act As If",short:"Begin behaving as the person you are becoming. Not fake — practice.",quote:'"Assume the feeling and act accordingly."',body:"An actor doesn't wait until opening night to learn their lines — they practice. When you decide who you're becoming, you start practicing the behaviors of that person. How would they carry themselves? What choices would they make?",practice:"Think of your future self. What's one thing they would do today that you're not doing? Do that one thing."},
+  {id:17,title:"Your Words Are Spells",short:"What you say about yourself — out loud, in your head — is constantly casting your reality.",quote:'"Do not speak of your problems. Speak only of what you intend to create."',body:"Every word is either building or breaking. When you tell the story of all your problems, you're reinforcing that story. The new practice: speak about what you're CREATING, not what you're struggling with.",practice:"Today, catch yourself speaking your problems. Instead, say 'I'm working on that' or 'things are shifting' and leave it there."},
+  {id:18,title:"The Bridge of Incidents",short:"You don't need to know HOW it will happen. Feel the end. The universe handles the how.",quote:'"Do not bother with the how. Go to the end. The bridges will appear."',body:"You imagine your dream and then start worrying about HOW it's going to happen. Neville said that's not your job. Your job is to FEEL the end result as already real. The people, opportunities, and ideas will appear naturally.",practice:"Think of your biggest dream. Write down all the 'buts' and 'hows.' Then consciously set them aside and just FEEL the end result."},
+  {id:19,title:"Consciousness Is the Only Reality",short:"How you feel is the cause of the world you see — not the other way around.",quote:'"Consciousness is the only reality."',body:"Most people think: IF things get better, THEN I'll feel better. Neville said it's backwards. FEEL better, and things get better. When you shift inside, the outside MUST shift to match. It's law.",practice:"Choose one area of life to shift your feelings about — even slightly — before the outer evidence arrives. Practice feeling better about it NOW."},
+  {id:20,title:"Revise Beliefs About Others",short:"If you want someone to change, change your assumptions about them.",quote:'"Assume the best about others and you will bring out their best."',body:"Everyone is you pushed out. If you hold someone in the image of broken or hopeless, you hold them there. Try imagining them as well, whole, happy, improved. Talk to the version of them you want to see.",practice:"Think of someone you wish was different. Write a short paragraph describing them as you'd love them to be — healthy, happy, free. Read it as truth."},
+  {id:21,title:"You Have Everything You Need",short:"The creative power to change your life is already inside you. It always has been.",quote:'"Stop seeking God in the external world. The kingdom of heaven is within you."',body:"You've learned the philosophy. Your imagination is your creative power. Feeling is the language of creation. Your assumptions shape your reality. You are living yesterday's prayers and can plant today's seeds for tomorrow's harvest.\n\nYou don't need anyone's permission. You don't need things to be perfect first. Begin right now.",practice:"Write a letter from your future self — 3 years from now — to your present self. Tell yourself what you've become, what happened, and what you want your present self to know."},
+];
+
+// ══════════════════════════════════════
+//  STORAGE
+// ══════════════════════════════════════
+function getUserState(id) {
+  const all = JSON.parse(localStorage.getItem('ng_users') || '{}');
+  if (!all[id]) all[id] = { manifestPlan:null, completedLessons:[], dailyChecks:{}, journalEntries:[], streak:0, lastCheckin:null, selectedFeelings:[], gratitude:{} };
+  return all[id];
+}
+function saveUserState(id, st) {
+  const all = JSON.parse(localStorage.getItem('ng_users') || '{}');
+  all[id] = st; localStorage.setItem('ng_users', JSON.stringify(all));
+}
+function getCheckins() { return JSON.parse(localStorage.getItem('ng_checkins') || '{}'); }
+function saveCheckins(c) { localStorage.setItem('ng_checkins', JSON.stringify(c)); }
+
+// ══════════════════════════════════════
+//  SESSION
+// ══════════════════════════════════════
+let activeUser = null, userState = null, currentLessonId = null, replyingTo = null, sharingDetails = false;
+
+function isMom() { return activeUser === MOM_ID; }
+
+// ══════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════
+(function init() {
+  // Build who screen
+  const grid = document.getElementById('who-grid');
+  grid.innerHTML = ALL_USERS.map(u => `
+    <div class="who-card ${u.isMom?'mom-card':''}" onclick="goLogin('${u.id}')">
+      <div class="who-avatar" style="background:${u.color}22">${u.emoji}</div>
+      <div class="who-name">${u.name}</div>
+      <div style="font-size:10px;color:${u.isMom?'var(--accent)':'var(--muted)'};margin-top:-4px">🔒 passcode</div>
+    </div>`).join('');
+  document.querySelectorAll('.modal-bg').forEach(mb => mb.addEventListener('click', e => { if(e.target===mb) mb.classList.remove('open'); }));
+})();
+
+let pendingUserId = null;
+
+function goLogin(userId) {
+  pendingUserId = userId;
+  const user = ALL_USERS.find(u => u.id === userId);
+  document.getElementById('login-avatar').textContent = user.emoji;
+  document.getElementById('login-name').innerHTML = `Hey,<br/><em>${user.name}</em>`;
+  // Tint the card to the user's color
+  document.getElementById('login-card').style.borderColor = user.color + '66';
+  document.getElementById('mom-passcode').value = '';
+  document.getElementById('mom-login-error').textContent = '';
+  showScreen('mom-login');
+  setTimeout(() => document.getElementById('mom-passcode').focus(), 300);
+}
+
+function checkMomLogin() {
+  const v = document.getElementById('mom-passcode').value;
+  const user = ALL_USERS.find(u => u.id === pendingUserId);
+  if (!user) return;
+  if (v === user.code) {
+    selectUser(pendingUserId);
+  } else {
+    document.getElementById('mom-login-error').textContent = 'Wrong passcode. Try again.';
+    document.getElementById('mom-passcode').value = '';
+  }
+}
+
+function selectUser(id) {
+  activeUser = id;
+  userState = getUserState(id);
+  const nav = document.getElementById('main-nav');
+  nav.style.display = 'flex';
+
+  // Mom gets a "Kids" dashboard tab; kids get "Check In" tab
+  const dashBtn = document.getElementById('nav-dashboard-btn');
+  const checkinBtn = document.getElementById('nav-checkin-btn');
+  if (isMom()) {
+    dashBtn.style.display = 'flex';
+    checkinBtn.style.display = 'none';
+    document.getElementById('nav-checkin-label').textContent = 'Check In';
+  } else {
+    dashBtn.style.display = 'none';
+    checkinBtn.style.display = 'flex';
+  }
+
+  showScreen('home');
+  renderHome();
+
+  // Show onboarding on first ever login
+  if (!userState.seenOnboarding) {
+    setTimeout(() => startOnboarding(), 400);
+  }
+}
+
+function switchUser() {
+  activeUser = null; userState = null;
+  document.getElementById('main-nav').style.display = 'none';
+  showScreen('who');
+}
+
+// ══════════════════════════════════════
+//  SCREENS
+// ══════════════════════════════════════
+function showScreen(id, btn) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  else { const t = document.querySelector(`[data-target="${id}"]`); if(t) t.classList.add('active'); }
+  if (id==='home') renderHome();
+  if (id==='daily') renderDaily();
+  if (id==='lessons') renderLessons();
+  if (id==='journal') renderJournal();
+  if (id==='checkin') renderCheckin();
+  if (id==='dashboard') { renderDashToday(); updateDashBadge(); }
+}
+
+// ══════════════════════════════════════
+//  HOME
+// ══════════════════════════════════════
+function renderHome() {
+  if (!activeUser) return;
+  const user = ALL_USERS.find(u => u.id === activeUser);
+  document.getElementById('home-greeting').textContent = isMom()
+    ? `Hapi Sun Up, Mom ☀️💜`
+    : `Hapi Sun Up, ${user.name} ${user.emoji}`;
+  document.getElementById('streak-num').textContent = userState.streak || 0;
+  document.getElementById('daily-quote').textContent = '"' + DAILY_QUOTES[new Date().getDate() % DAILY_QUOTES.length] + '"';
+
+  const k = today(), checks = userState.dailyChecks[k] || [], items = getDailyItems();
+  document.getElementById('home-check-count').textContent = `${checks.length}/${items.length}`;
+  document.getElementById('home-daily-items').innerHTML = items.slice(0,3).map((item,i) => {
+    const done = checks.includes(i);
+    return `<div class="check-item ${done?'checked':''}"><input type="checkbox" ${done?'checked':''} onchange="toggleCheck(${i})" /><label>${item}</label></div>`;
+  }).join('');
+
+  // Mom: kids overview block
+  document.getElementById('mom-home-overview').style.display = isMom() ? 'block' : 'none';
+  document.getElementById('mom-reply-card').style.display = 'none';
+
+  if (isMom()) {
+    renderMomKidsMini();
+  } else {
+    // Kid: reply notification
+    const allC = getCheckins()[activeUser] || [];
+    const unread = allC.find(c => c.parentReply && !c.childRead);
+    const rc = document.getElementById('mom-reply-card');
+    if (unread) { rc.style.display='block'; document.getElementById('mom-reply-preview').textContent = unread.parentReply.substring(0,80)+(unread.parentReply.length>80?'...':''); }
+    document.getElementById('checkin-dot').classList.toggle('show', allC.some(c => c.parentReply && !c.childRead));
+  }
+
+  const mp = document.getElementById('home-manifest-preview');
+  if (userState.manifestPlan) {
+    mp.innerHTML = `<p class="quote-text" style="font-size:15px">"${userState.manifestPlan.title}"</p><p class="body-text mt-8" style="font-size:13px">${userState.manifestPlan.affirmations?.[0]||''}</p><button class="btn btn-outline mt-12 btn-sm" onclick="showScreen('manifest')">View My Plan →</button>`;
+  } else {
+    mp.innerHTML = `<p class="body-text">You haven't created your plan yet.</p><button class="btn btn-outline mt-12" onclick="showScreen('manifest')">Begin Your Journey →</button>`;
+  }
+}
+
+function renderMomKidsMini() {
+  const allC = getCheckins(), k = today();
+  document.getElementById('mom-kids-mini').innerHTML = KIDS.map(kid => {
+    const entry = (allC[kid.id]||[]).find(c=>c.date===k);
+    const pct = entry ? Math.round(entry.tasksDone/entry.tasksTotal*100) : -1;
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+      <div style="display:flex;align-items:center;gap:8px"><span>${kid.emoji}</span><span style="font-size:14px;font-weight:500">${kid.name}</span></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        ${entry ? `<div style="display:flex;gap:3px">${(entry.taskNames||[]).map((_,i)=>`<div class="task-dot ${entry.tasksChecked?.includes(i)?'done':'miss'}"></div>`).join('')}</div>` : ''}
+        <span style="font-size:12px;color:${pct===100?'var(--green)':pct>=60?'var(--gold)':pct>=0?'var(--muted)':'var(--red)'}">${pct>=0?entry.tasksDone+'/'+entry.tasksTotal:'—'}</span>
+        ${entry?.message && !entry?.parentReply ? '<span style="font-size:12px">💌</span>' : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════
+//  DAILY
+// ══════════════════════════════════════
+function getDailyItems() {
+  const custom = userState?.manifestPlan ? [
+    `Say your affirmation: "${(userState.manifestPlan.affirmations?.[0]||'I am becoming my best self').substring(0,50)}..."`,
+    `Act as if: ${(userState.manifestPlan.act?.[0]||'carry yourself as your future self would').substring(0,50)}...`,
+  ] : [];
+  return ["Read today's lesson","Morning: Feel your wish fulfilled for 2 min","Write 3 things you're grateful for",...custom,"SATS before sleep"];
+}
+
+function renderDaily() {
+  if (!activeUser) return;
+  updateStreak();
+  const k = today(), checks = userState.dailyChecks[k] || [], items = getDailyItems();
+  const lIdx = (userState.completedLessons?.length || 0) % LESSONS.length;
+  const l = LESSONS[lIdx];
+  document.getElementById('todays-lesson-title').textContent = `Lesson ${l.id}: ${l.title}`;
+  document.getElementById('todays-lesson-body').textContent = l.short;
+
+  const affs = userState.manifestPlan?.affirmations?.length ? userState.manifestPlan.affirmations :
+    ["I am becoming the person I'm meant to be.","My imagination is creating my reality right now.","I am already living in yesterday's prayer.","I feel the joy of my wish fulfilled.","Everything I need is already within me.","I am grateful for how far I've come.","My future self is calling me forward."];
+  document.getElementById('daily-affirmation-text').textContent = affs[new Date().getDate() % affs.length];
+
+  document.getElementById('daily-checklist').innerHTML = items.map((item,i) => {
+    const done = checks.includes(i);
+    return `<div class="check-item ${done?'checked':''}" onclick="toggleCheck(${i})"><input type="checkbox" ${done?'checked':''} /><label>${item}</label></div>`;
+  }).join('');
+  document.getElementById('check-progress').textContent = `${checks.length} / ${items.length}`;
+  document.getElementById('gratitude-journal').value = userState.gratitude?.[k] || '';
+}
+
+function toggleCheck(idx) {
+  if (!activeUser) return;
+  const k = today();
+  if (!userState.dailyChecks[k]) userState.dailyChecks[k] = [];
+  const arr = userState.dailyChecks[k], pos = arr.indexOf(idx);
+  if (pos>-1) arr.splice(pos,1); else arr.push(idx);
+  saveUserState(activeUser, userState);
+  renderDaily(); renderHome();
+}
+function saveGratitude() {
+  const k = today();
+  if (!userState.gratitude) userState.gratitude = {};
+  userState.gratitude[k] = document.getElementById('gratitude-journal').value;
+  saveUserState(activeUser, userState); showToast('Gratitude saved 🙏');
+}
+function speakAffirmation() {
+  const t = document.getElementById('daily-affirmation-text').textContent;
+  if ('speechSynthesis' in window) { const u=new SpeechSynthesisUtterance(t);u.rate=.85;u.pitch=1.1;speechSynthesis.speak(u); }
+}
+
+// ══════════════════════════════════════
+//  CHECK-IN (kids only)
+// ══════════════════════════════════════
+function renderCheckin() {
+  if (!activeUser || isMom()) return;
+  sharingDetails = false;
+  document.getElementById('checkin-detail-section').style.display = 'none';
+  document.getElementById('btn-share-yes').style.background = 'rgba(126,212,168,.15)';
+  document.getElementById('msg-to-mom').value = '';
+
+  const k = today(), checks = userState.dailyChecks[k] || [], items = getDailyItems();
+  const pct = items.length ? Math.round(checks.length/items.length*100) : 0;
+  document.getElementById('checkin-summary').innerHTML = `
+    <div class="flex items-center gap-8 mb-12">
+      <span style="font-size:28px">${pct===100?'🌟':pct>=60?'✨':'🌱'}</span>
+      <div><div style="font-size:20px;font-weight:600;color:var(--gold)">${checks.length} of ${items.length} tasks done</div>
+      <div style="font-size:13px;color:var(--muted)">${pct===100?'Perfect day! You showed up fully.':pct>=60?'Good progress today.':'Every step counts. Keep going.'}</div></div>
+    </div>
+    ${items.map((item,i)=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)"><div class="task-dot ${checks.includes(i)?'done':'miss'}"></div><span style="font-size:13px;color:${checks.includes(i)?'var(--text)':'var(--muted)'}">${item.substring(0,58)}${item.length>58?'...':''}</span></div>`).join('')}`;
+
+  const g = userState.gratitude?.[k] || '';
+  document.getElementById('shared-detail-preview').innerHTML = `<strong>Tasks:</strong> ${checks.length}/${items.length} completed${g?`<br/><strong>Gratitude:</strong> ${g.substring(0,100)}${g.length>100?'...':''}` : ''}`;
+
+  const allC = getCheckins()[activeUser] || [];
+  const hasThread = allC.some(c => c.message || c.parentReply);
+  const tc = document.getElementById('reply-thread-card');
+  if (hasThread) {
+    tc.style.display = 'block';
+    document.getElementById('msg-thread-child').innerHTML = allC.slice(-6).map(c => {
+      let h = '';
+      if (c.message) h += `<div><div class="msg-time">${c.date} ${c.checkedInAt} — you</div><div class="msg-bubble msg-child">${c.message}</div></div>`;
+      if (c.parentReply) { h += `<div style="text-align:right"><div class="msg-time">${c.parentRepliedAt} — Mom 💜</div><div class="msg-bubble msg-parent">${c.parentReply}</div></div>`; c.childRead = true; }
+      return h;
+    }).join('');
+    const all=getCheckins(); all[activeUser]=allC; saveCheckins(all);
+    document.getElementById('checkin-dot').classList.remove('show');
+  } else tc.style.display='none';
+}
+
+function toggleShareDetails(share) {
+  sharingDetails = share;
+  document.getElementById('checkin-detail-section').style.display = share ? 'block' : 'none';
+  document.getElementById('btn-share-yes').style.background = share ? 'rgba(126,212,168,.3)' : 'rgba(126,212,168,.15)';
+}
+
+function sendCheckin() {
+  if (!activeUser || isMom()) return;
+  const k=today(), checks=userState.dailyChecks[k]||[], items=getDailyItems();
+  const msg=document.getElementById('msg-to-mom').value.trim();
+  const entry={date:k,checkedInAt:new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}),tasksDone:checks.length,tasksTotal:items.length,taskNames:items,tasksChecked:[...checks],sharedDetails:sharingDetails,gratitude:sharingDetails?(userState.gratitude?.[k]||''):null,message:msg||null,parentReply:null,parentRepliedAt:null,childRead:false};
+  const all=getCheckins();
+  if (!all[activeUser]) all[activeUser]=[];
+  all[activeUser]=all[activeUser].filter(c=>c.date!==k);
+  all[activeUser].push(entry);
+  saveCheckins(all);
+  showToast('Checked in with Mom ✓ 💜');
+  document.getElementById('msg-to-mom').value='';
+  setTimeout(renderCheckin,400);
+}
+
+// ══════════════════════════════════════
+//  MOM DASHBOARD
+// ══════════════════════════════════════
+function dashTab(btn, tab) {
+  document.querySelectorAll('#screen-dashboard .tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  ['today','history','messages'].forEach(t=>{ document.getElementById(`dash-${t}`).style.display=t===tab?'block':'none'; });
+  if (tab==='today') renderDashToday();
+  if (tab==='history') renderDashHistory();
+  if (tab==='messages') renderDashMessages();
+}
+
+function updateDashBadge() {
+  const all=getCheckins();
+  const hasNew=KIDS.some(k=>(all[k.id]||[]).some(e=>e.message&&!e.parentReply));
+  document.getElementById('dtab-messages').innerHTML='Messages'+(hasNew?' <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-left:4px;vertical-align:middle"></span>':'');
+  document.getElementById('dash-dot').classList.toggle('show', hasNew);
+}
+
+function renderDashToday() {
+  updateDashBadge();
+  const allC=getCheckins(), k=today();
+  document.getElementById('dash-today').innerHTML = KIDS.map(kid => {
+    const st=getUserState(kid.id), entry=(allC[kid.id]||[]).find(c=>c.date===k);
+    const pct=entry?Math.round(entry.tasksDone/entry.tasksTotal*100):-1;
+    const col=pct===100?'var(--green)':pct>=60?'var(--gold)':'var(--muted)';
+    return `<div class="card" style="margin-bottom:12px">
+      <div class="flex justify-between items-center mb-8">
+        <div class="flex items-center gap-8"><span style="font-size:22px">${kid.emoji}</span>
+          <div><div style="font-weight:600;font-size:16px">${kid.name}</div>
+          <div style="font-size:11px;color:var(--muted)">🔥${st.streak||0} streak · Lesson ${(st.completedLessons?.length||0)+1}/21</div></div>
+        </div>
+        ${entry?`<span class="pill pill-green">✓ In</span>`:`<span class="pill pill-red">Pending</span>`}
+      </div>
+      ${entry ? `
+        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px">${(entry.taskNames||[]).map((_,i)=>`<div class="task-dot ${entry.tasksChecked?.includes(i)?'done':'miss'}" title="${(entry.taskNames[i]||'').substring(0,35)}"></div>`).join('')}</div>
+        <div style="font-size:13px;color:${col}">${entry.tasksDone}/${entry.tasksTotal} tasks · ${entry.checkedInAt}</div>
+        ${entry.sharedDetails&&entry.gratitude?`<div style="font-size:12px;color:var(--muted);margin-top:6px;font-style:italic;padding:8px;background:rgba(255,255,255,.03);border-radius:8px">"${entry.gratitude.substring(0,100)}${entry.gratitude.length>100?'...':''}"</div>`:''}
+        ${entry.message?`<div style="font-size:13px;color:var(--accent);margin-top:8px;padding:8px 12px;background:rgba(201,126,181,.08);border-radius:8px">💌 "${entry.message.substring(0,100)}${entry.message.length>100?'...':''}"</div>`:''}
+        ${entry.message&&!entry.parentReply?`<button class="btn btn-accent btn-sm mt-8" onclick="openReply('${kid.id}')">Reply to ${kid.name} →</button>`:''}
+        ${entry.parentReply?`<div style="font-size:12px;color:var(--green);margin-top:6px">✓ You replied at ${entry.parentRepliedAt}</div>`:''}
+      ` : `<div style="font-size:13px;color:var(--muted)">No check-in yet today</div>`}
+    </div>`;
+  }).join('');
+}
+
+function renderDashHistory() {
+  const all=getCheckins();
+  document.getElementById('dash-history').innerHTML=KIDS.map(kid=>{
+    const entries=(all[kid.id]||[]).slice().reverse().slice(0,14);
+    return `<div class="card" style="margin-bottom:14px">
+      <div class="flex items-center gap-8 mb-10"><span style="font-size:20px">${kid.emoji}</span><h3 style="margin:0">${kid.name}</h3></div>
+      ${entries.length?entries.map(e=>{
+        const pct=Math.round(e.tasksDone/e.tasksTotal*100);
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+          <span style="font-size:13px;color:var(--muted)">${e.date}</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="display:flex;gap:3px">${(e.taskNames||[]).map((_,i)=>`<div class="task-dot ${e.tasksChecked?.includes(i)?'done':'miss'}"></div>`).join('')}</div>
+            <span style="font-size:12px;color:${pct===100?'var(--green)':pct>=60?'var(--gold)':'var(--muted)'}">${e.tasksDone}/${e.tasksTotal}</span>
+            ${e.message?'<span style="font-size:11px">💌</span>':''}
+          </div></div>`;
+      }).join(''):`<p class="body-text" style="font-size:13px;color:var(--muted)">No history yet.</p>`}
+    </div>`;
+  }).join('');
+}
+
+function renderDashMessages() {
+  const all=getCheckins();
+  let html='';
+  KIDS.forEach(kid=>{
+    const entries=(all[kid.id]||[]).filter(c=>c.message||c.parentReply);
+    if(!entries.length)return;
+    const unreplied=entries.some(e=>e.message&&!e.parentReply);
+    html+=`<div class="card" style="margin-bottom:14px">
+      <div class="flex justify-between items-center mb-10">
+        <div class="flex items-center gap-8"><span style="font-size:20px">${kid.emoji}</span><h3 style="margin:0">${kid.name}</h3></div>
+        ${unreplied?`<button class="btn btn-accent btn-sm" onclick="openReply('${kid.id}')">Reply →</button>`:''}
+      </div>
+      <div class="msg-thread">${entries.slice(-6).map(e=>{
+        let h='';
+        if(e.message)h+=`<div><div class="msg-time">${e.date} ${e.checkedInAt}</div><div class="msg-bubble msg-child">${e.message}</div></div>`;
+        if(e.parentReply)h+=`<div style="text-align:right"><div class="msg-time">${e.parentRepliedAt} — You</div><div class="msg-bubble msg-parent">${e.parentReply}</div></div>`;
+        return h;
+      }).join('')}</div>
+    </div>`;
+  });
+  document.getElementById('dash-messages').innerHTML=html||'<p class="body-text text-center" style="padding:24px;color:var(--muted)">No messages yet. When your kids check in with a message, it will appear here.</p>';
+}
+
+function openReply(kidId) {
+  const kid=KIDS.find(k=>k.id===kidId);
+  const entries=getCheckins()[kidId]||[];
+  const found=entries.map((c,i)=>({c,i})).reverse().find(({c})=>c.message&&!c.parentReply);
+  if(!found)return;
+  replyingTo={kidId,idx:found.i};
+  document.getElementById('reply-modal-title').textContent=`Reply to ${kid.name} ${kid.emoji}`;
+  document.getElementById('reply-msg-preview').innerHTML=`<em style="color:var(--muted);font-size:11px">${found.c.date}</em><br/>"${found.c.message}"`;
+  document.getElementById('parent-reply-text').value='';
+  document.getElementById('parent-reply-modal').classList.add('open');
+}
+function sendParentReply() {
+  if(!replyingTo)return;
+  const text=document.getElementById('parent-reply-text').value.trim();
+  if(!text)return;
+  const all=getCheckins();
+  all[replyingTo.kidId][replyingTo.idx].parentReply=text;
+  all[replyingTo.kidId][replyingTo.idx].parentRepliedAt=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  all[replyingTo.kidId][replyingTo.idx].childRead=false;
+  saveCheckins(all);
+  closeModal('parent-reply-modal');
+  showToast('Reply sent 💜');
+  renderDashToday(); renderDashMessages(); updateDashBadge();
+}
+
+// ══════════════════════════════════════
+//  MANIFEST
+// ══════════════════════════════════════
+function handleImageUpload(input) {
+  const file=input.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=e=>{document.getElementById('upload-placeholder').style.display='none';const img=document.getElementById('upload-preview');img.src=e.target.result;img.style.display='block';};
+  r.readAsDataURL(file);
+}
+
+function wizardNext(step) {
+  // Hide all wizard steps
+  [0,1,2,3].forEach(i=>{const e=document.getElementById(`wiz-${i}`);if(e)e.style.display='none';});
+  document.getElementById('wiz-4-ai').style.display='none';
+  document.getElementById('wiz-4-diy').style.display='none';
+  document.getElementById(`wiz-${step}`).style.display='block';
+  // Update dots (5 dots: 0-4, step 4 maps to index 4)
+  const dotStep = step; // 0-3 map directly; 4a/4b handled separately
+  document.querySelectorAll('#wizard-dots .dot').forEach((d,i)=>{
+    d.className='dot'+(i<dotStep?' done':'')+(i===dotStep?' active':'');
+  });
+  if(step===2)renderFeelings();
+}
+
+function choosePlanMode(mode) {
+  // Hide choice step
+  document.getElementById('wiz-3').style.display='none';
+  // Mark all 4 dots done, last active
+  document.querySelectorAll('#wizard-dots .dot').forEach((d,i)=>{
+    d.className='dot'+(i<4?' done':'')+(i===4?' active':'');
+  });
+  if(mode==='ai'){
+    document.getElementById('wiz-4-ai').style.display='block';
+    generatePlan();
+  } else {
+    document.getElementById('wiz-4-diy').style.display='block';
+  }
+}
+
+function renderFeelings() {
+  document.getElementById('feeling-options').innerHTML=FEELINGS.map(f=>{
+    const s=userState.selectedFeelings?.includes(f);
+    return `<span onclick="toggleFeeling('${f}')" style="cursor:pointer;display:inline-block;padding:4px 12px;border-radius:20px;margin:3px;font-size:13px;border:1px solid ${s?'rgba(232,201,126,.5)':'rgba(255,255,255,.1)'};background:${s?'rgba(232,201,126,.15)':'rgba(255,255,255,.04)'};color:${s?'var(--gold)':'var(--muted)'};transition:all .2s">${f}</span>`;
+  }).join('');
+}
+function toggleFeeling(f) {
+  if(!userState.selectedFeelings)userState.selectedFeelings=[];
+  const i=userState.selectedFeelings.indexOf(f);
+  if(i>-1)userState.selectedFeelings.splice(i,1);else userState.selectedFeelings.push(f);
+  renderFeelings();
+}
+
+async function generatePlan() {
+  const vision=document.getElementById('vision-text').value.trim();
+  document.getElementById('plan-loading').style.display='block';
+  document.getElementById('plan-output').style.display='none';
+  const feelings=(userState.selectedFeelings||[]).join(', ')||'peaceful, free, loved';
+  const feelingExtra=document.getElementById('feeling-extra').value;
+  const isMomUser=isMom();
+  const prompt=`You are a loving life coach teaching Neville Goddard's philosophy to someone ready to transform their life. ${isMomUser?'They are a mother working on themselves while supporting her children.':'They are a young person who is struggling and needs encouragement.'}
+
+THEIR VISION: "${vision}"
+FEELINGS THEY WANT: ${feelings}. ${feelingExtra}
+
+Respond ONLY with valid JSON, no markdown:
+{"title":"5-7 word poetic name for their dream","intro":"2 warm sentences affirming their vision, mention living yesterday's prayers and planting seeds for tomorrow","gratitude":["3 things they likely already have to be grateful for"],"affirmations":["5 powerful I AM affirmations, present tense, personal, feeling-rich"],"think":["3 mental practices specific to their vision"],"act":["3 specific daily act-as-if behaviors"],"speak":["3 specific things to say out loud"],"sats":"One vivid sensory paragraph of the scene to imagine before sleep — mundane, warm, specific, implying the dream came true"}`;
+
+  let plan = null;
+  try {
+    const apiKey = localStorage.getItem('ng_apikey') || '';
+    if (!apiKey) {
+      // No key stored — show key setup
+      document.getElementById('wiz-4-ai').style.display = 'none';
+      showApiKeySetup();
+      return;
+    }
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true"
+      },
+      body: JSON.stringify({model:"claude-sonnet-4-20250514", max_tokens:1000, messages:[{role:"user", content:prompt}]})
+    });
+    if (!res.ok) {
+      if (res.status === 401) {
+        localStorage.removeItem('ng_apikey');
+        document.getElementById('wiz-4-ai').style.display = 'none';
+        showApiKeySetup('That key didn\'t work. Double-check it and try again.');
+        return;
+      }
+      throw new Error('API error ' + res.status);
+    }
+    const data = await res.json();
+    const raw = data.content.map(b => b.text || '').join('');
+    plan = JSON.parse(raw.replace(/```json|```/g, '').trim());
+  } catch(e) {
+    document.getElementById('wiz-4-ai').style.display = 'none';
+    document.getElementById('wiz-4-diy').style.display = 'block';
+    showToast("Couldn't connect — write your own plan below! 🌱");
+    return;
+  }
+  renderPlanEditor(plan);
+}
+
+// Render AI plan into editable fields
+function renderPlanEditor(plan) {
+  document.getElementById('plan-loading').style.display='none';
+  document.getElementById('plan-output').style.display='block';
+
+  document.getElementById('plan-title-input').value = plan.title || '';
+  document.getElementById('plan-intro-input').value = plan.intro || '';
+  document.getElementById('plan-sats-input').value = plan.sats || '';
+
+  renderEditableList('plan-gratitude-edit', plan.gratitude || [], 'gratitude');
+  renderEditableList('plan-affirmations-edit', plan.affirmations || [], 'affirmation');
+  renderEditableList('plan-think-edit', plan.think || [], 'think');
+  renderEditableList('plan-act-edit', plan.act || [], 'act');
+  renderEditableList('plan-speak-edit', plan.speak || [], 'speak');
+}
+
+function renderEditableList(containerId, items, type) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = items.map((item, i) => `
+    <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px">
+      <textarea rows="2" data-type="${type}" data-idx="${i}" style="flex:1;font-size:13px;line-height:1.5">${item}</textarea>
+      <button onclick="removePlanItem('${containerId}','${type}',${i})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:8px 4px;flex-shrink:0">×</button>
+    </div>`).join('');
+}
+
+function addPlanItem(type) {
+  const map = { gratitude:'plan-gratitude-edit', affirmation:'plan-affirmations-edit', think:'plan-think-edit', act:'plan-act-edit', speak:'plan-speak-edit' };
+  const el = document.getElementById(map[type]);
+  const count = el.querySelectorAll('textarea').length;
+  const div = document.createElement('div');
+  div.style.cssText = 'display:flex;align-items:flex-start;gap:8px;margin-bottom:8px';
+  div.innerHTML = `<textarea rows="2" data-type="${type}" data-idx="${count}" style="flex:1;font-size:13px;line-height:1.5" placeholder="Add yours..."></textarea><button onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:8px 4px;flex-shrink:0">×</button>`;
+  el.appendChild(div);
+  div.querySelector('textarea').focus();
+}
+
+function removePlanItem(containerId, type, idx) {
+  const el = document.getElementById(containerId);
+  const rows = el.querySelectorAll('div');
+  if(rows[idx]) rows[idx].remove();
+}
+
+function getEditableList(containerId) {
+  return Array.from(document.getElementById(containerId).querySelectorAll('textarea'))
+    .map(t=>t.value.trim()).filter(Boolean);
+}
+
+// Save AI plan (reads from editable fields)
+function savePlanFromEditor() {
+  const plan = {
+    title: document.getElementById('plan-title-input').value.trim() || 'My Manifestation',
+    intro: document.getElementById('plan-intro-input').value.trim(),
+    gratitude: getEditableList('plan-gratitude-edit'),
+    affirmations: getEditableList('plan-affirmations-edit'),
+    think: getEditableList('plan-think-edit'),
+    act: getEditableList('plan-act-edit'),
+    speak: getEditableList('plan-speak-edit'),
+    sats: document.getElementById('plan-sats-input').value.trim(),
+  };
+  if(!plan.title){showToast('Give your dream a name first ✨');return;}
+  userState.manifestPlan = plan;
+  saveUserState(activeUser, userState);
+  showToast('Plan saved! Your journey begins now ✨');
+  showScreen('home');
+}
+
+// Save DIY plan (reads from guided prompt fields)
+function saveDiyPlan() {
+  const title = document.getElementById('diy-title').value.trim();
+  if(!title){showToast('Give your dream a name first ✨');return;}
+
+  const g1=document.getElementById('diy-gratitude-1').value.trim();
+  const g2=document.getElementById('diy-gratitude-2').value.trim();
+  const g3=document.getElementById('diy-gratitude-3').value.trim();
+  const gratitude=[g1,g2,g3].filter(Boolean);
+
+  const affText=document.getElementById('diy-affirmations').value.trim();
+  const affirmations=affText.split('\n').map(l=>l.trim()).filter(Boolean);
+
+  const thinkText=document.getElementById('diy-think').value.trim();
+  const think=thinkText.split('\n').map(l=>l.trim()).filter(Boolean);
+
+  const actText=document.getElementById('diy-act').value.trim();
+  const act=actText.split('\n').map(l=>l.trim()).filter(Boolean);
+
+  const speakText=document.getElementById('diy-speak').value.trim();
+  const speak=speakText.split('\n').map(l=>l.trim()).filter(Boolean);
+
+  const sats=document.getElementById('diy-sats').value.trim();
+
+  if(!affirmations.length){showToast('Write at least one affirmation ✨');return;}
+
+  const plan = {
+    title,
+    intro: `This is ${document.getElementById('vision-text')?.value?.substring(0,80) || 'my vision'} — and I wrote this plan in my own words because every word of it is true.`,
+    gratitude,affirmations,think,act,speak,sats
+  };
+  userState.manifestPlan = plan;
+  saveUserState(activeUser, userState);
+  showToast('Your plan is saved — in your own words ✨');
+  showScreen('home');
+}
+
+function showApiKeySetup(errorMsg = '') {
+  document.getElementById('apikey-error').textContent = errorMsg;
+  document.getElementById('apikey-input').value = '';
+  document.getElementById('apikey-modal').classList.add('open');
+}
+
+function saveApiKey() {
+  const key = document.getElementById('apikey-input').value.trim();
+  if (!key.startsWith('sk-ant-')) {
+    document.getElementById('apikey-error').textContent = 'That doesn\'t look right — your key should start with sk-ant-';
+    return;
+  }
+  localStorage.setItem('ng_apikey', key);
+  closeModal('apikey-modal');
+  // Re-trigger plan generation now that we have the key
+  document.getElementById('wiz-4-ai').style.display = 'block';
+  generatePlan();
+}
+
+function switchManifestTab(btn,tab) {
+  document.querySelectorAll('#screen-manifest .tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  ['think','act','speak'].forEach(t=>{document.getElementById(`tab-${t}`).style.display=t===tab?'block':'none';});
+}
+function savePlanAndGoHome() {
+  saveUserState(activeUser,userState);
+  showToast('Plan saved! Your journey begins now ✨');
+  showScreen('home');
+}
+
+// ══════════════════════════════════════
+//  LESSONS
+// ══════════════════════════════════════
+function renderLessons() {
+  if(!activeUser)return;
+  const completed = userState.completedLessons || [];
+  const nextIdx = completed.length; // index of the lesson to unlock next (0-based)
+
+  document.getElementById('lessons-list').innerHTML = LESSONS.map((l, idx) => {
+    const done = completed.includes(l.id);
+    const isCurrent = idx === nextIdx;
+    const isLocked = idx > nextIdx;
+
+    let numClass = 'lesson-num';
+    let numContent = l.id;
+    let itemClass = 'lesson-item';
+    let statusBadge = '';
+
+    if (done) {
+      numClass += ' done'; numContent = '✓'; itemClass += ' done';
+      statusBadge = `<span style="font-size:10px;color:var(--green);white-space:nowrap">Complete ✓</span>`;
+    } else if (isCurrent) {
+      numClass += ' current'; itemClass += ' current-lesson';
+      statusBadge = `<span style="font-size:10px;color:var(--gold);white-space:nowrap">Ready ✨</span>`;
+    } else if (isLocked) {
+      numClass += ' locked'; numContent = '🔒'; itemClass += ' locked';
+      statusBadge = `<span style="font-size:10px;color:var(--muted);white-space:nowrap">Locked</span>`;
+    }
+
+    const clickHandler = isLocked ? '' : `onclick="openLesson(${l.id})"`;
+    return `<div class="${itemClass}" ${clickHandler}>
+      <div class="${numClass}">${numContent}</div>
+      <div style="flex:1">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+          <div style="font-weight:500;font-size:14px">${l.title}</div>
+          ${statusBadge}
+        </div>
+        <div style="color:var(--muted);font-size:12px;margin-top:3px">${l.short.substring(0,55)}...</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function openLesson(id) {
+  // Guard: don't open if locked
+  const completed = userState.completedLessons || [];
+  const lessonIdx = LESSONS.findIndex(l => l.id === id);
+  const nextIdx = completed.length;
+  if (lessonIdx > nextIdx) { showToast('Complete the previous lesson first 🔒'); return; }
+
+  currentLessonId = id;
+  const l = LESSONS.find(x => x.id === id);
+  document.getElementById('modal-lesson-title').textContent = `Lesson ${l.id}: ${l.title}`;
+  document.getElementById('modal-lesson-quote').textContent = l.quote;
+  document.getElementById('modal-lesson-body').textContent = l.body;
+  document.getElementById('modal-lesson-practice').innerHTML = `<div class="card" style="background:rgba(232,201,126,.06);border-color:rgba(232,201,126,.2)"><span class="label">Today's Practice</span><p class="body-text">${l.practice}</p></div>`;
+  // Show "Mark Complete" only if not already done
+  const isDone = completed.includes(id);
+  document.getElementById('modal-complete-btn').style.display = isDone ? 'none' : 'block';
+  document.getElementById('modal-revisit-note').style.display = isDone ? 'block' : 'none';
+  document.getElementById('lesson-modal').classList.add('open');
+}
+function openLessonModal() {
+  const completed = userState.completedLessons || [];
+  const nextLesson = LESSONS[completed.length] || LESSONS[LESSONS.length - 1];
+  openLesson(nextLesson.id);
+}
+function markLessonDone() {
+  if(!userState.completedLessons)userState.completedLessons=[];
+  if(currentLessonId&&!userState.completedLessons.includes(currentLessonId)){
+    userState.completedLessons.push(currentLessonId);
+    saveUserState(activeUser,userState);
+  }
+  closeModal('lesson-modal');
+  renderLessons();
+  renderDaily(); // update the daily screen's current lesson
+  const nextLesson = LESSONS[userState.completedLessons.length];
+  if (nextLesson) showToast(`Lesson complete! Lesson ${nextLesson.id} unlocked 🌟`);
+  else showToast('All 21 lessons complete! 🌟✨');
+}
+
+// ══════════════════════════════════════
+//  JOURNAL
+// ══════════════════════════════════════
+function renderJournal() {
+  if(!activeUser)return;
+  const el=document.getElementById('journal-entries');
+  if(!userState.journalEntries?.length){el.innerHTML='<p class="body-text text-center" style="padding:24px;color:var(--muted)">Your proof book is empty — start collecting evidence that your life is shifting.</p>';return;}
+  el.innerHTML=userState.journalEntries.slice().reverse().map(e=>`<div class="card" style="margin-bottom:12px"><div style="color:var(--muted);font-size:11px;margin-bottom:6px">${e.date}</div><p class="body-text" style="white-space:pre-wrap;font-size:14px">${e.text}</p></div>`).join('');
+}
+function addJournalEntry() {
+  const text=document.getElementById('new-entry').value.trim();
+  if(!text)return;
+  if(!userState.journalEntries)userState.journalEntries=[];
+  userState.journalEntries.push({text,date:new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})});
+  document.getElementById('new-entry').value='';
+  saveUserState(activeUser,userState);renderJournal();showToast('Entry saved 📖');
+}
+
+// ══════════════════════════════════════
+//  ONBOARDING
+// ══════════════════════════════════════
+let obStep = 0;
+const OB_KIDS_STEPS = [0, 1, 2, 3, 4]; // slide ids: ob-0,ob-1,ob-2,ob-3-kids,ob-4
+const OB_MOM_STEPS  = [0, 1, 2, 3, 4]; // same count, different slide 3
+
+function startOnboarding() {
+  obStep = 0;
+  const user = ALL_USERS.find(u => u.id === activeUser);
+  document.getElementById('ob-final-emoji').textContent = user.emoji;
+  renderObSlide();
+  document.getElementById('onboarding-modal').classList.add('open');
+}
+
+function getObSlideId(step) {
+  const map = isMom()
+    ? ['ob-0','ob-1','ob-2','ob-3-mom','ob-4']
+    : ['ob-0','ob-1','ob-2','ob-3-kids','ob-4'];
+  return map[step];
+}
+
+function renderObSlide() {
+  const total = 5;
+  // Hide all slides
+  document.querySelectorAll('.ob-slide').forEach(s => s.style.display = 'none');
+  // Show current
+  document.getElementById(getObSlideId(obStep)).style.display = 'block';
+  // Dots
+  const dotsEl = document.getElementById('ob-dots-nav');
+  dotsEl.innerHTML = Array.from({length: total}, (_,i) =>
+    `<div style="width:7px;height:7px;border-radius:50%;background:${i===obStep?'var(--gold)':'rgba(255,255,255,.2)'};transition:all .3s"></div>`
+  ).join('');
+  // Buttons
+  document.getElementById('ob-back-btn').disabled = obStep === 0;
+  document.getElementById('ob-back-btn').style.opacity = obStep === 0 ? '0.3' : '1';
+  const nextBtn = document.getElementById('ob-next-btn');
+  if (obStep === total - 1) {
+    nextBtn.style.display = 'none'; // last slide uses the gold button
+  } else {
+    nextBtn.style.display = 'block';
+  }
+}
+
+function obNav(dir) {
+  const total = 5;
+  obStep = Math.max(0, Math.min(total - 1, obStep + dir));
+  renderObSlide();
+}
+
+function finishOnboarding() {
+  userState.seenOnboarding = true;
+  saveUserState(activeUser, userState);
+  document.getElementById('onboarding-modal').classList.remove('open');
+}
+
+// ══════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════
+function today(){return new Date().toDateString();}
+function updateStreak() {
+  if(!activeUser)return;
+  const t=today();
+  if(userState.lastCheckin!==t){
+    const y=new Date();y.setDate(y.getDate()-1);
+    userState.streak=userState.lastCheckin===y.toDateString()?(userState.streak||0)+1:1;
+    userState.lastCheckin=t;saveUserState(activeUser,userState);
+  }
+}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function showToast(msg) {
+  const t=document.createElement('div');t.textContent=msg;
+  Object.assign(t.style,{position:'fixed',bottom:'90px',left:'50%',transform:'translateX(-50%)',background:'rgba(232,201,126,.96)',color:'#0d0d1a',padding:'10px 20px',borderRadius:'20px',fontSize:'14px',fontWeight:'500',zIndex:'400',fontFamily:'DM Sans,sans-serif',whiteSpace:'nowrap'});
+  document.body.appendChild(t);setTimeout(()=>t.remove(),2500);
+}
+</script>
+</body>
+</html>
+
