@@ -531,7 +531,9 @@
 <!-- ══ ONBOARDING MODAL ══ -->
 <div class="modal-bg" id="onboarding-modal">
   <div class="modal" style="max-width:420px;padding:0;overflow:hidden;border:1px solid rgba(232,201,126,.25)">
-
+    <div style="display:flex;justify-content:flex-end;padding:12px 16px 0">
+      <button onclick="finishOnboarding()" style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;line-height:1">✕</button>
+    </div>
     <!-- Slide container -->
     <div id="ob-slides" style="position:relative;min-height:380px">
 
@@ -628,7 +630,7 @@
           <p class="quote-text" style="font-size:14px">"You are already that which you want to be. Your refusal to believe this is the only reason you do not see it."</p>
           <p style="font-size:11px;color:var(--muted);margin-top:6px">— Neville Goddard</p>
         </div>
-        <button class="btn btn-gold" onclick="finishOnboarding()">Let's go ✨</button>
+        <button class="btn btn-gold" onclick="finishOnboarding()" style="font-size:16px;padding:16px">I got it — let's go ✨</button>
       </div>
 
     </div>
@@ -1175,13 +1177,23 @@ function toggleFeeling(f) {
 }
 
 async function generatePlan() {
-  const vision=document.getElementById('vision-text').value.trim();
-  document.getElementById('plan-loading').style.display='block';
-  document.getElementById('plan-output').style.display='none';
-  const feelings=(userState.selectedFeelings||[]).join(', ')||'peaceful, free, loved';
-  const feelingExtra=document.getElementById('feeling-extra').value;
-  const isMomUser=isMom();
-  const prompt=`You are a loving life coach teaching Neville Goddard's philosophy to someone ready to transform their life. ${isMomUser?'They are a mother working on themselves while supporting her children.':'They are a young person who is struggling and needs encouragement.'}
+  const vision = document.getElementById('vision-text').value.trim();
+  document.getElementById('plan-loading').style.display = 'block';
+  document.getElementById('plan-output').style.display = 'none';
+
+  // Check for API key BEFORE anything else — outside try/catch
+  const apiKey = localStorage.getItem('ng_apikey') || '';
+  if (!apiKey) {
+    document.getElementById('plan-loading').style.display = 'none';
+    document.getElementById('wiz-4-ai').style.display = 'none';
+    showApiKeySetup();
+    return;
+  }
+
+  const feelings = (userState.selectedFeelings || []).join(', ') || 'peaceful, free, loved';
+  const feelingExtra = document.getElementById('feeling-extra').value;
+  const isMomUser = isMom();
+  const prompt = `You are a loving life coach teaching Neville Goddard's philosophy to someone ready to transform their life. ${isMomUser?'They are a mother working on themselves while supporting her children.':'They are a young person who is struggling and needs encouragement.'}
 
 THEIR VISION: "${vision}"
 FEELINGS THEY WANT: ${feelings}. ${feelingExtra}
@@ -1191,13 +1203,6 @@ Respond ONLY with valid JSON, no markdown:
 
   let plan = null;
   try {
-    const apiKey = localStorage.getItem('ng_apikey') || '';
-    if (!apiKey) {
-      // No key stored — show key setup
-      document.getElementById('wiz-4-ai').style.display = 'none';
-      showApiKeySetup();
-      return;
-    }
     const res = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -1206,11 +1211,12 @@ Respond ONLY with valid JSON, no markdown:
         "anthropic-version": "2023-06-01",
         "anthropic-dangerous-direct-browser-access": "true"
       },
-      body: JSON.stringify({model:"claude-sonnet-4-20250514", max_tokens:1000, messages:[{role:"user", content:prompt}]})
+      body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 1000, messages: [{ role: "user", content: prompt }] })
     });
     if (!res.ok) {
       if (res.status === 401) {
         localStorage.removeItem('ng_apikey');
+        document.getElementById('plan-loading').style.display = 'none';
         document.getElementById('wiz-4-ai').style.display = 'none';
         showApiKeySetup('That key didn\'t work. Double-check it and try again.');
         return;
@@ -1221,6 +1227,7 @@ Respond ONLY with valid JSON, no markdown:
     const raw = data.content.map(b => b.text || '').join('');
     plan = JSON.parse(raw.replace(/```json|```/g, '').trim());
   } catch(e) {
+    document.getElementById('plan-loading').style.display = 'none';
     document.getElementById('wiz-4-ai').style.display = 'none';
     document.getElementById('wiz-4-diy').style.display = 'block';
     showToast("Couldn't connect — write your own plan below! 🌱");
@@ -1538,4 +1545,3 @@ function showToast(msg) {
 </script>
 </body>
 </html>
-
