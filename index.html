@@ -1505,9 +1505,11 @@ function renderObSlide() {
   document.getElementById('ob-back-btn').style.opacity = obStep === 0 ? '0.3' : '1';
   const nextBtn = document.getElementById('ob-next-btn');
   if (obStep === total - 1) {
-    nextBtn.style.display = 'none'; // last slide uses the gold button
+    nextBtn.textContent = '✕ Close';
+    nextBtn.onclick = finishOnboarding;
   } else {
-    nextBtn.style.display = 'block';
+    nextBtn.textContent = 'Next →';
+    nextBtn.onclick = () => obNav(1);
   }
 }
 
@@ -1545,3 +1547,4 @@ function showToast(msg) {
 </script>
 </body>
 </html>
+
